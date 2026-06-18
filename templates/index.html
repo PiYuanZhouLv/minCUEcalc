@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🎵 CUE 智能选择工具</title>
     <style>
-        /* ===== 原有样式（全部保留，仅新增模态框样式） ===== */
+        /* ===== 样式完整保留 ===== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, sans-serif; background: #f6f8fa; padding: 24px; padding-bottom: 120px; }
         .container { max-width: 1300px; margin: 0 auto; background: #fff; border-radius: 16px; padding: 28px 32px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
@@ -15,16 +15,9 @@
         .row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
         .flex-grow { flex: 1; min-width: 200px; }
         label { font-weight: 500; font-size: 14px; color: #334155; }
-        input[type="text"], input[type="search"] {
-            width: 100%; padding: 10px 14px; border: 1.5px solid #d1d9e6; border-radius: 10px;
-            font-size: 14px; background: #fafbfc; transition: border 0.2s;
-        }
+        input[type="text"], input[type="search"] { width: 100%; padding: 10px 14px; border: 1.5px solid #d1d9e6; border-radius: 10px; font-size: 14px; background: #fafbfc; transition: border 0.2s; }
         input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
-        .btn {
-            padding: 10px 22px; border: none; border-radius: 10px; font-size: 14px; font-weight: 500;
-            cursor: pointer; transition: background 0.2s, transform 0.1s; display: inline-flex;
-            align-items: center; gap: 6px; white-space: nowrap;
-        }
+        .btn { padding: 10px 22px; border: none; border-radius: 10px; font-size: 14px; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.1s; display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
         .btn:active { transform: scale(0.97); }
         .btn-primary { background: #3b82f6; color: #fff; }
         .btn-primary:hover { background: #2563eb; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
@@ -58,67 +51,19 @@
         .song-item { display: flex; align-items: flex-start; padding: 8px 16px; border-bottom: 1px solid #eef2f6; gap: 8px; }
         .song-item:hover { background: #f1f8ff; }
         .song-item input[type="checkbox"] { margin-top: 3px; flex-shrink: 0; }
-        .song-item .info { flex: 1; display: flex; flex-direction: column; gap: 2px; width: 0;}
+        .song-item .info { flex: 1; display: flex; flex-direction: column; gap: 2px; width: 0; }
         .song-item .title { font-weight: 500; display: flex; align-items: center; gap: 6px; }
-        .song-item .title .split-btn {
-            font-size: 12px;
-            padding: 0 4px;
-            background: #e9edf2;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: #475569;
-            transition: background 0.2s;
-        }
+        .song-item .title .split-btn { font-size: 12px; padding: 0 4px; background: #e9edf2; border: none; border-radius: 4px; cursor: pointer; color: #475569; transition: background 0.2s; }
         .song-item .title .split-btn:hover { background: #d1d9e6; }
-        .song-item .title .merge-btn {
-            font-size: 12px;
-            padding: 0 4px;
-            background: #dbeafe;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            color: #2563eb;
-            transition: background 0.2s;
-        }
+        .song-item .title .merge-btn { font-size: 12px; padding: 0 4px; background: #dbeafe; border: none; border-radius: 4px; cursor: pointer; color: #2563eb; transition: background 0.2s; }
         .song-item .title .merge-btn:hover { background: #bfdbfe; }
         .song-item .alt-titles { font-size: 12px; color: #64748b; display: flex; flex-wrap: wrap; gap: 4px 8px; }
         .song-item .alt-titles .alt { background: #f1f4f9; padding: 1px 6px; border-radius: 4px; }
         .song-item .sources { font-size: 12px; color: #94a3b8; word-break: break-all; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
-        .song-item .sources .cue-path {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 4px 8px;
-            width: 100%;
-            background: #f1f4f9;
-            padding: 1px 6px;
-            border-radius: 4px;
-        }
-        .song-item .sources .cue-path .cue-file {
-            word-break: break-all;
-            flex: 0 1 auto;
-            width: 100%;
-        }
-        .song-item .sources .cue-path .performer-tag {
-            flex: 1;
-            min-width: 0;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-weight: 500;
-            color: #475569;
-        }
-        .song-item .sources .cue-path .play-btn {
-            flex: 0 0 auto;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #3b82f6;
-            font-size: 14px;
-            padding: 0 2px;
-            line-height: 1;
-        }
+        .song-item .sources .cue-path { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; width: 100%; background: #f1f4f9; padding: 1px 6px; border-radius: 4px; }
+        .song-item .sources .cue-path .cue-file { word-break: break-all; flex: 0 1 auto; width: 100%; }
+        .song-item .sources .cue-path .performer-tag { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: #475569; }
+        .song-item .sources .cue-path .play-btn { flex: 0 0 auto; background: none; border: none; cursor: pointer; color: #3b82f6; font-size: 14px; padding: 0 2px; line-height: 1; }
         .song-item .sources .cue-path .play-btn:hover { color: #2563eb; }
         .result-area { margin-top: 20px; border: 1px solid #e9edf2; border-radius: 12px; background: #fafbfc; padding: 20px; display: none; }
         .result-area.visible { display: block; }
@@ -138,7 +83,7 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         @media (max-width: 768px) { .main-layout { flex-direction: column; } .song-panel { min-width: unset; } }
 
-        /* 迷你播放器（保留原有） */
+        /* 迷你播放器 */
         #miniPlayer { display:none; position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:#fff; padding:12px 20px; box-shadow:0 -2px 10px rgba(0,0,0,0.3); z-index:1000; font-family: -apple-system, sans-serif; }
         #miniPlayer .player-inner { display:flex; align-items:center; gap:16px; flex-wrap:wrap; max-width:1300px; margin:0 auto; }
         #miniPlayer .player-cover { width:48px; height:48px; object-fit:cover; border-radius:4px; flex-shrink:0; background:#475569; cursor:pointer; }
@@ -159,1580 +104,1669 @@
         #miniPlayer .player-status { font-size:13px; color:#94a3b8; }
         @media (max-width:600px) { #miniPlayer .player-inner { gap:8px; } #miniPlayer .player-info { min-width:60px; } #miniPlayer .player-cover { width:36px; height:36px; } }
 
-        /* 封面预览浮窗（保留原有） */
-        #coverPreview {
-            display: none;
-            position: fixed;
-            z-index: 9999;
-            background: #1e293b;
-            border-radius: 12px;
-            padding: 14px;
-            box-shadow: 0 8px 30px rgba(0,0,0,0.7);
-            color: #fff;
-            pointer-events: none;
-            max-width: min(460px, 80vw);
-            max-height: 80vh;
-            overflow: hidden;
-            gap: 6px;
-            transition: opacity 0.12s;
-        }
-        #coverPreview img {
-            width: 100%;
-            height: 100%;
-            min-height: 0;
-            object-fit: contain;
-            border-radius: 6px;
-            background: #0f172a;
-            display: block;
-        }
-        #coverPreview .info {
-            flex: 0 0 auto;
-            width: 100%;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #94a3b8;
-            word-break: break-word;
-            padding-top: 6px;
-            border-top: 1px solid #334155;
-        }
+        /* 封面预览浮窗 */
+        #coverPreview { display: none; position: fixed; z-index: 9999; background: #1e293b; border-radius: 12px; padding: 14px; box-shadow: 0 8px 30px rgba(0,0,0,0.7); color: #fff; pointer-events: none; max-width: min(460px, 80vw); max-height: 80vh; overflow: hidden; gap: 6px; transition: opacity 0.12s; }
+        #coverPreview img { width: 100%; height: 100%; min-height: 0; object-fit: contain; border-radius: 6px; background: #0f172a; display: block; }
+        #coverPreview .info { flex: 0 0 auto; width: 100%; font-size: 13px; line-height: 1.6; color: #94a3b8; word-break: break-word; padding-top: 6px; border-top: 1px solid #334155; }
         #coverPreview .info strong { color: #e2e8f0; }
         #coverPreview .info .filename { color: #f1f5f9; }
 
-        /* ===== 拆分模态框 ===== */
-        #splitModal {
-            display: none;
-            position: fixed;
-            z-index: 10000;
-            left: 0; top: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            justify-content: center;
-            align-items: center;
-        }
-        #splitModal .modal-content {
-            background: #fff;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 600px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
-        }
-        #splitModal .modal-content h3 {
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        #splitModal .modal-content .source-list {
-            list-style: none;
-            padding: 0;
-        }
-        #splitModal .modal-content .source-list li {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 4px;
-            border-bottom: 1px solid #e9edf2;
-            font-size: 13px;
-        }
-        #splitModal .modal-content .source-list li input[type="checkbox"] {
-            flex-shrink: 0;
-        }
-        #splitModal .modal-content .source-list li .cue-info {
-            flex: 1;
-            word-break: break-all;
-        }
-        #splitModal .modal-content .source-list li .perf-info {
-            color: #475569;
-            font-weight: 500;
-        }
-        #splitModal .modal-footer {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 16px;
-        }
+        /* 拆分模态框 */
+        #splitModal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
+        #splitModal .modal-content { background: #fff; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
+        #splitModal .modal-content h3 { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        #splitModal .modal-content .source-list { list-style: none; padding: 0; }
+        #splitModal .modal-content .source-list li { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid #e9edf2; font-size: 13px; }
+        #splitModal .modal-content .source-list li input[type="checkbox"] { flex-shrink: 0; }
+        #splitModal .modal-content .source-list li .cue-info { flex: 1; word-break: break-all; }
+        #splitModal .modal-content .source-list li .perf-info { color: #475569; font-weight: 500; }
+        #splitModal .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
-        .song-item .sources .cue-path.ctrl-hover {
-            cursor: alias;
-            background: rgba(59, 130, 246, 0.08);
-            border-radius: 4px;
-        }
+        .song-item .sources .cue-path.ctrl-hover { cursor: alias; background: rgba(59, 130, 246, 0.08); border-radius: 4px; }
     </style>
 </head>
 <body>
-<div class="container" id="app">
-    <h1>🎵 CUE 智能选择工具 <small>多目录 · 同名合并 · 原始歌名 · 音频预览</small></h1>
-    <div class="dir-manager">
-        <div class="row">
-            <label>📁 扫描目录</label>
-            <div class="flex-grow">
-                <div style="display:flex; gap:8px;">
-                    <input type="text" id="newDirInput" placeholder="输入完整目录路径" style="flex:1;" />
-                    <button class="btn btn-secondary" id="browseDirBtn">📂 浏览...</button>
+    <div class="container" id="app">
+        <h1>🎵 CUE 智能选择工具 <small>多目录 · 同名合并 · 原始歌名 · 音频预览</small></h1>
+        <div class="dir-manager">
+            <div class="row">
+                <label>📁 扫描目录</label>
+                <div class="flex-grow">
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="newDirInput" placeholder="输入完整目录路径" style="flex:1;" />
+                        <button class="btn btn-secondary" id="browseDirBtn">📂 浏览...</button>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="addDirBtn">➕ 添加</button>
+                <button class="btn btn-success" id="scanAllBtn">🔍 扫描全部</button>
+            </div>
+            <div class="dir-list" id="dirList"></div>
+            <div id="scanStatus" style="margin-top:8px;font-size:14px;color:#475569;"></div>
+        </div>
+        <hr />
+        <div class="main-layout">
+            <div class="song-panel">
+                <div class="toolbar">
+                    <div class="search-box">
+                        <span class="icon">🔎</span>
+                        <input type="search" id="searchInput" placeholder="搜索歌名或表演者..." />
+                    </div>
+                    <span class="count-badge" id="countDisplay">共 <strong>0</strong> 首</span>
+                    <button class="btn btn-outline" id="selectAllBtn">✅ 全选</button>
+                    <button class="btn btn-outline" id="deselectAllBtn">⬜ 取消全选</button>
+                </div>
+                <div class="song-list" id="songListContainer">
+                    <div class="list-header">
+                        <label><input type="checkbox" id="headerCheckbox" /> 全选</label>
+                        <span style="margin-left:auto;font-size:12px;color:#94a3b8;">点击行切换 · ▶ 预览</span>
+                    </div>
+                    <div id="songList"><div class="empty-msg">📂 请添加目录并扫描</div></div>
+                </div>
+                <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+                    <span style="font-size:13px;color:#475569;">方案数量 K：</span>
+                    <input type="number" id="KInput" value="20" min="1" step="1" style="width:60px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
+                    <span style="font-size:13px;color:#475569;margin-left:8px;">权重：</span>
+                    <span style="font-size:12px;color:#64748b;">CUE</span>
+                    <input type="number" id="w_c_input" value="10" min="0" step="0.5" style="width:55px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
+                    <span style="font-size:12px;color:#64748b;">缺失</span>
+                    <input type="number" id="w_m_input" value="5" min="0" step="0.5" style="width:55px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
+                    <span style="font-size:12px;color:#64748b;">额外</span>
+                    <input type="number" id="w_e_input" value="1" min="0" step="0.5" style="width:55px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
+                    <button class="btn btn-success" id="computeBtn" disabled>🧮 计算最佳组合</button>
+                    <span style="align-self:center;font-size:13px;color:#94a3b8;" id="hintText">请勾选歌曲</span>
                 </div>
             </div>
-            <button class="btn btn-primary" id="addDirBtn">➕ 添加</button>
-            <button class="btn btn-success" id="scanAllBtn">🔍 扫描全部</button>
-        </div>
-        <div class="dir-list" id="dirList"></div>
-        <div id="scanStatus" style="margin-top:8px;font-size:14px;color:#475569;"></div>
-    </div>
-    <hr />
-    <div class="main-layout">
-        <div class="song-panel">
-            <div class="toolbar">
-                <div class="search-box">
-                    <span class="icon">🔎</span>
-                    <input type="search" id="searchInput" placeholder="搜索歌名或表演者..." />
-                </div>
-                <span class="count-badge" id="countDisplay">共 <strong>0</strong> 首</span>
-                <button class="btn btn-outline" id="selectAllBtn">✅ 全选</button>
-                <button class="btn btn-outline" id="deselectAllBtn">⬜ 取消全选</button>
+            <div class="selected-panel" id="selectedPanel">
+                <h3>✅ 已选歌曲 (<span id="selectedCount">0</span>)</h3>
+                <div id="selectedList"><span style="color:#94a3b8;font-size:13px;">暂无选择</span></div>
             </div>
-            <div class="song-list" id="songListContainer">
-                <div class="list-header">
-                    <label><input type="checkbox" id="headerCheckbox" /> 全选</label>
-                    <span style="margin-left:auto;font-size:12px;color:#94a3b8;">点击行切换 · ▶ 预览</span>
-                </div>
-                <div id="songList"><div class="empty-msg">📂 请添加目录并扫描</div></div>
+        </div>
+        <hr />
+        <div class="result-area" id="resultArea">
+            <h3>📊 计算结果 <span class="badge" id="resultBadge">0 个方案</span></h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <!-- 迷你播放器 -->
+    <div id="miniPlayer">
+        <div class="player-inner">
+            <img class="player-cover" id="playerCover" src="" alt="封面" />
+            <div class="player-info">
+                <div class="player-title" id="playerTitle"><span class="scroll-text">歌曲名</span></div>
+                <div class="player-artist" id="playerArtist"><span class="scroll-text">歌手</span></div>
+                <div class="player-album" id="playerAlbum"><span class="scroll-text">专辑</span></div>
             </div>
-            <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
-            <span style="font-size:13px;color:#475569;">方案数量 K：</span>
-            <input type="number" id="KInput" value="20" min="1" step="1" style="width:60px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
-
-            <span style="font-size:13px;color:#475569;margin-left:8px;">权重：</span>
-            <span style="font-size:12px;color:#64748b;">CUE</span>
-            <input type="number" id="w_c_input" value="10" min="0" step="0.5" style="width:55px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
-            <span style="font-size:12px;color:#64748b;">缺失</span>
-            <input type="number" id="w_m_input" value="5" min="0" step="0.5" style="width:55px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
-            <span style="font-size:12px;color:#64748b;">额外</span>
-            <input type="number" id="w_e_input" value="1" min="0" step="0.5" style="width:55px;padding:4px 8px;border:1px solid #d1d9e6;border-radius:6px;font-size:13px;" />
-
-            <button class="btn btn-success" id="computeBtn" disabled>🧮 计算最佳组合</button>
-            <span style="align-self:center;font-size:13px;color:#94a3b8;" id="hintText">请勾选歌曲</span>
-        </div>
-        </div>
-        <div class="selected-panel" id="selectedPanel">
-            <h3>✅ 已选歌曲 (<span id="selectedCount">0</span>)</h3>
-            <div id="selectedList"><span style="color:#94a3b8;font-size:13px;">暂无选择</span></div>
+            <button class="player-btn" id="playerModeBtn" title="单曲播放">▶1</button>
+            <button class="player-btn" id="playerPrevBtn" title="上一首">⏮</button>
+            <button class="player-btn" id="playerPlayBtn">⏸</button>
+            <button class="player-btn" id="playerNextBtn" title="下一首">⏭</button>
+            <button class="player-btn" id="playerStopBtn">⏹</button>
+            <div class="player-progress-area">
+                <span class="player-time" id="playerCurrentTime">0:00</span>
+                <input type="range" id="playerProgress" min="0" max="100" value="0" />
+                <span class="player-time" id="playerDuration">0:00</span>
+            </div>
+            <span class="player-status" id="playerStatus">就绪</span>
         </div>
     </div>
-    <hr />
-    <div class="result-area" id="resultArea">
-        <h3>📊 计算结果 <span class="badge" id="resultBadge">0 个方案</span></h3>
-        <div id="resultContent"></div>
-    </div>
-</div>
 
-<!-- 迷你播放器 -->
-<div id="miniPlayer">
-    <div class="player-inner">
-        <img class="player-cover" id="playerCover" src="" alt="封面" />
-        <div class="player-info">
-            <div class="player-title" id="playerTitle"><span class="scroll-text">歌曲名</span></div>
-            <div class="player-artist" id="playerArtist"><span class="scroll-text">歌手</span></div>
-            <div class="player-album" id="playerAlbum"><span class="scroll-text">专辑</span></div>
-        </div>
-        <button class="player-btn" id="playerPlayBtn">⏸</button>
-        <button class="player-btn" id="playerStopBtn">⏹</button>
-        <div class="player-progress-area">
-            <span class="player-time" id="playerCurrentTime">0:00</span>
-            <input type="range" id="playerProgress" min="0" max="100" value="0" />
-            <span class="player-time" id="playerDuration">0:00</span>
-        </div>
-        <span class="player-status" id="playerStatus">就绪</span>
-    </div>
-</div>
-
-<!-- 封面预览浮窗 -->
-<div id="coverPreview">
-    <img id="previewImage" src="" alt="封面大图" />
-    <div class="info">
-        <div><strong>文件名：</strong><span class="filename" id="previewFilename">-</span></div>
-        <div><strong>尺寸：</strong><span id="previewSize">-</span></div>
-        <div><strong>格式：</strong><span id="previewFormat">-</span></div>
-    </div>
-</div>
-
-<!-- 拆分模态框 -->
-<div id="splitModal">
-    <div class="modal-content">
-        <h3>
-            <span>✂️ 选择要拆分的来源</span>
-            <button class="btn btn-outline" id="modalCloseBtn" style="padding:4px 12px;">✕</button>
-        </h3>
-        <p style="font-size:13px;color:#64748b;margin-bottom:10px;">勾选您希望独立出来的版本（默认不选），未勾选的将保留在原合并条目中。</p>
-        <ul class="source-list" id="sourceList"></ul>
-        <div class="modal-footer">
-            <button class="btn btn-secondary" id="modalCancelBtn">取消</button>
-            <button class="btn btn-primary" id="modalConfirmBtn">✅ 确认拆分</button>
+    <!-- 封面预览浮窗 -->
+    <div id="coverPreview">
+        <img id="previewImage" src="" alt="封面大图" />
+        <div class="info">
+            <div><strong>文件名：</strong><span class="filename" id="previewFilename">-</span></div>
+            <div><strong>尺寸：</strong><span id="previewSize">-</span></div>
+            <div><strong>格式：</strong><span id="previewFormat">-</span></div>
         </div>
     </div>
-</div>
 
-<script>
-// ========================== 前端逻辑 ==========================
-const $ = s => document.querySelector(s);
-const $$ = s => document.querySelectorAll(s);
+    <!-- 拆分模态框 -->
+    <div id="splitModal">
+        <div class="modal-content">
+            <h3>
+                <span>✂️ 选择要拆分的来源</span>
+                <button class="btn btn-outline" id="modalCloseBtn" style="padding:4px 12px;">✕</button>
+            </h3>
+            <p style="font-size:13px;color:#64748b;margin-bottom:10px;">勾选您希望独立出来的版本（默认不选），未勾选的将保留在原合并条目中。</p>
+            <ul class="source-list" id="sourceList"></ul>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="modalCancelBtn">取消</button>
+                <button class="btn btn-primary" id="modalConfirmBtn">✅ 确认拆分</button>
+            </div>
+        </div>
+    </div>
 
-const state = {
-    dirs: [],
-    songs: [],           // 原始合并列表（从后端返回，不可变）
-    displaySongs: [],    // 实际显示列表（根据 splitMap 构建）
-    splitMap: {},        // { 原ID: [子ID1, 子ID2, ...] }
-    selected: new Set(),
-    searching: '',
-    results: null,
-    _pendingSelected: null,
-    initialized: false,
-    _pendingSplitParentId: null,
-};
-let currentSongId = null;  // 当前播放的歌曲 ID
+    <script>
+        // ========================== 完整前端逻辑 ==========================
+        const $ = s => document.querySelector(s);
+        const $$ = s => document.querySelectorAll(s);
 
-// DOM 引用
-const newDirInput = $('#newDirInput');
-const addDirBtn = $('#addDirBtn');
-const browseDirBtn = $('#browseDirBtn');
-const scanAllBtn = $('#scanAllBtn');
-const dirList = $('#dirList');
-const scanStatus = $('#scanStatus');
-const searchInput = $('#searchInput');
-const songList = $('#songList');
-const countDisplay = $('#countDisplay');
-const headerCheckbox = $('#headerCheckbox');
-const selectAllBtn = $('#selectAllBtn');
-const deselectAllBtn = $('#deselectAllBtn');
-const computeBtn = $('#computeBtn');
-const hintText = $('#hintText');
-const selectedList = $('#selectedList');
-const selectedCount = $('#selectedCount');
-const resultArea = $('#resultArea');
-const resultBadge = $('#resultBadge');
-const resultContent = $('#resultContent');
-
-const miniPlayer = $('#miniPlayer');
-const playerCover = $('#playerCover');
-const playerTitle = $('#playerTitle');
-const playerArtist = $('#playerArtist');
-const playerAlbum = $('#playerAlbum');
-const playerPlayBtn = $('#playerPlayBtn');
-const playerStopBtn = $('#playerStopBtn');
-const playerProgress = $('#playerProgress');
-const playerCurrentTime = $('#playerCurrentTime');
-const playerDuration = $('#playerDuration');
-const playerStatus = $('#playerStatus');
-
-const coverPreview = $('#coverPreview');
-const previewImage = $('#previewImage');
-const previewFilename = $('#previewFilename');
-const previewSize = $('#previewSize');
-const previewFormat = $('#previewFormat');
-
-const splitModal = $('#splitModal');
-const sourceList = $('#sourceList');
-const modalConfirmBtn = $('#modalConfirmBtn');
-const modalCancelBtn = $('#modalCancelBtn');
-const modalCloseBtn = $('#modalCloseBtn');
-
-const PLACEHOLDER_SVG = `data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23475569'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%2364748b'/%3E%3Ctext x='50' y='70' font-size='40' text-anchor='middle' fill='%23f1f5f9' font-family='sans-serif'%3E♪%3C/text%3E%3C/svg%3E`;
-
-// ----- 播放器控制（未修改） -----
-let currentAudio = null;
-let currentSongTitle = '';
-let currentCoverData = { path: '', name: '', format: '', width: 0, height: 0 };
-
-function formatTime(seconds) {
-    if (!seconds || isNaN(seconds)) return '0:00';
-    const m = Math.floor(seconds / 60);
-    const s = Math.floor(seconds % 60);
-    return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-function showPlayer(title, coverPath, album, artist) {
-    miniPlayer.style.display = 'block';
-    const titleText = title || '未知歌曲';
-    playerTitle.innerHTML = `<span class="scroll-text">${titleText}</span>`;
-    playerTitle.title = titleText;
-    const artistText = artist && artist.trim() ? artist : '未知歌手';
-    const albumText = album && album.trim() ? album : '未知专辑';
-    playerArtist.innerHTML = `<span class="scroll-text">${artistText}</span>`;
-    playerArtist.title = artistText;
-    playerAlbum.innerHTML = `<span class="scroll-text">${albumText}</span>`;
-    playerAlbum.title = albumText;
-    currentSongTitle = titleText;
-    if (coverPath) {
-        playerCover.src = `/api/cover?path=${encodeURIComponent(coverPath)}`;
-        const parts = coverPath.split(/[\\/]/);
-        const filename = parts[parts.length - 1] || 'cover';
-        const ext = filename.includes('.') ? filename.split('.').pop().toUpperCase() : '未知';
-        currentCoverData = { path: coverPath, name: filename, format: ext, width: 0, height: 0 };
-        playerCover.style.display = 'block';
-    } else {
-        playerCover.src = PLACEHOLDER_SVG;
-        currentCoverData = { path: '', name: '占位图', format: 'SVG', width: 48, height: 48 };
-        playerCover.style.display = 'block';
-    }
-    playerCover.onload = null;
-    if (coverPath) {
-        playerCover.onload = function() {
-            const w = this.naturalWidth || 0;
-            const h = this.naturalHeight || 0;
-            if (w && h) {
-                currentCoverData.width = w;
-                currentCoverData.height = h;
-            }
+        const state = {
+            dirs: [],
+            songs: [],
+            displaySongs: [],
+            splitMap: {},
+            selected: new Set(),
+            searching: '',
+            results: null,
+            _pendingSelected: null,
+            initialized: false,
+            _pendingSplitParentId: null,
+            playMode: 'single',
+            playlist: [],
+            playIndex: -1,
         };
-        if (playerCover.complete && playerCover.naturalWidth) {
-            currentCoverData.width = playerCover.naturalWidth;
-            currentCoverData.height = playerCover.naturalHeight;
-        }
-    }
-    if (window._titleScroller) { window._titleScroller.stop(); window._titleScroller = null; }
-    if (window._artistScroller) { window._artistScroller.stop(); window._artistScroller = null; }
-    if (window._albumScroller) { window._albumScroller.stop(); window._albumScroller = null; }
-    window._titleScroller = new ScrollManager(playerTitle);
-    window._artistScroller = new ScrollManager(playerArtist);
-    window._albumScroller = new ScrollManager(playerAlbum);
-    window._titleScroller.start();
-    window._artistScroller.start();
-    window._albumScroller.start();
-    playerTitle.addEventListener('mouseenter', () => { if (window._titleScroller) window._titleScroller.pause(); });
-    playerTitle.addEventListener('mouseleave', () => { if (window._titleScroller) window._titleScroller.resume(); });
-    playerArtist.addEventListener('mouseenter', () => { if (window._artistScroller) window._artistScroller.pause(); });
-    playerArtist.addEventListener('mouseleave', () => { if (window._artistScroller) window._artistScroller.resume(); });
-    playerAlbum.addEventListener('mouseenter', () => { if (window._albumScroller) window._albumScroller.pause(); });
-    playerAlbum.addEventListener('mouseleave', () => { if (window._albumScroller) window._albumScroller.resume(); });
-}
+        let currentSongId = null;
+        let currentAudio = null;
+        let audioController = null;
+        let isAdvancing = false;
+        let currentSongTitle = '';
+        let currentCoverData = { path: '', name: '', format: '', width: 0, height: 0 };
 
-const SCROLL_SPEED = 30;
-class ScrollManager {
-    constructor(element, speed = SCROLL_SPEED) {
-        this.element = element;
-        this.speed = speed;
-        this.textSpan = element.querySelector('.scroll-text');
-        if (!this.textSpan) return;
-        this.rafId = null;
-        this.running = false;
-        this.paused = false;
-        this.lastTimestamp = null;
-        this.scrollPos = 0;
-        this.maxScroll = 0;
-        this.updateMaxScroll();
-        if (this.textSpan) {
-            this.element.title = this.textSpan.textContent;
+        // DOM 引用
+        const newDirInput = $('#newDirInput');
+        const addDirBtn = $('#addDirBtn');
+        const browseDirBtn = $('#browseDirBtn');
+        const scanAllBtn = $('#scanAllBtn');
+        const dirList = $('#dirList');
+        const scanStatus = $('#scanStatus');
+        const searchInput = $('#searchInput');
+        const songList = $('#songList');
+        const countDisplay = $('#countDisplay');
+        const headerCheckbox = $('#headerCheckbox');
+        const selectAllBtn = $('#selectAllBtn');
+        const deselectAllBtn = $('#deselectAllBtn');
+        const computeBtn = $('#computeBtn');
+        const hintText = $('#hintText');
+        const selectedList = $('#selectedList');
+        const selectedCount = $('#selectedCount');
+        const resultArea = $('#resultArea');
+        const resultBadge = $('#resultBadge');
+        const resultContent = $('#resultContent');
+
+        const miniPlayer = $('#miniPlayer');
+        const playerCover = $('#playerCover');
+        const playerTitle = $('#playerTitle');
+        const playerArtist = $('#playerArtist');
+        const playerAlbum = $('#playerAlbum');
+        const playerPlayBtn = $('#playerPlayBtn');
+        const playerStopBtn = $('#playerStopBtn');
+        const playerProgress = $('#playerProgress');
+        const playerCurrentTime = $('#playerCurrentTime');
+        const playerDuration = $('#playerDuration');
+        const playerStatus = $('#playerStatus');
+
+        const coverPreview = $('#coverPreview');
+        const previewImage = $('#previewImage');
+        const previewFilename = $('#previewFilename');
+        const previewSize = $('#previewSize');
+        const previewFormat = $('#previewFormat');
+
+        const splitModal = $('#splitModal');
+        const sourceList = $('#sourceList');
+        const modalConfirmBtn = $('#modalConfirmBtn');
+        const modalCancelBtn = $('#modalCancelBtn');
+        const modalCloseBtn = $('#modalCloseBtn');
+
+        const PLACEHOLDER_SVG = `data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23475569'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%2364748b'/%3E%3Ctext x='50' y='70' font-size='40' text-anchor='middle' fill='%23f1f5f9' font-family='sans-serif'%3E♪%3C/text%3E%3C/svg%3E`;
+
+        // ----- 辅助函数 -----
+        function formatTime(seconds) {
+            if (!seconds || isNaN(seconds)) return '0:00';
+            const m = Math.floor(seconds / 60);
+            const s = Math.floor(seconds % 60);
+            return `${m}:${s.toString().padStart(2, '0')}`;
         }
-    }
-    updateMaxScroll() {
-        const containerWidth = this.element.clientWidth;
-        const contentWidth = this.textSpan.scrollWidth;
-        this.maxScroll = Math.max(0, contentWidth - containerWidth);
-        if (this.maxScroll <= 0) {
-            this.stop();
-            this.scrollPos = 0;
-            this.element.scrollLeft = 0;
-            return false;
-        }
-        return true;
-    }
-    start() {
-        if (this.running) return;
-        if (!this.updateMaxScroll()) return;
-        this.running = true;
-        this.scrollPos = -this.element.clientWidth;
-        this.element.scrollLeft = 0;
-        this.lastTimestamp = null;
-        this.rafId = requestAnimationFrame(this.tick.bind(this));
-    }
-    tick(timestamp) {
-        if (!this.running) return;
-        if (this.paused) {
-            this.lastTimestamp = timestamp;
-            this.rafId = requestAnimationFrame(this.tick.bind(this));
-            return;
-        }
-        if (this.lastTimestamp === null) {
-            this.lastTimestamp = timestamp;
-            this.rafId = requestAnimationFrame(this.tick.bind(this));
-            return;
-        }
-        const delta = (timestamp - this.lastTimestamp) / 1000;
-        this.lastTimestamp = timestamp;
-        let move = this.speed * delta;
-        this.scrollPos += move;
-        if (this.scrollPos >= this.element.scrollWidth) {
-            this.scrollPos = -this.element.clientWidth;
-        }
-        this.element.scrollLeft = this.scrollPos;
-        this.rafId = requestAnimationFrame(this.tick.bind(this));
-    }
-    pause() { this.paused = true; }
-    resume() {
-        this.paused = false;
-        if (!this.running) this.start();
-    }
-    stop() {
-        this.running = false;
-        if (this.rafId) {
-            cancelAnimationFrame(this.rafId);
-            this.rafId = null;
-        }
-        this.element.scrollLeft = 0;
-        this.scrollPos = 0;
-    }
-    resize() {
-        if (this.running) {
-            const hasScroll = this.updateMaxScroll();
-            if (!hasScroll) {
-                this.stop();
-                return;
+
+        // ----- 滚动字幕管理 -----
+        const SCROLL_SPEED = 30;
+        class ScrollManager {
+            constructor(element, speed = SCROLL_SPEED) {
+                this.element = element;
+                this.speed = speed;
+                this.textSpan = element.querySelector('.scroll-text');
+                if (!this.textSpan) return;
+                this.rafId = null;
+                this.running = false;
+                this.paused = false;
+                this.lastTimestamp = null;
+                this.scrollPos = 0;
+                this.maxScroll = 0;
+                this.updateMaxScroll();
+                if (this.textSpan) this.element.title = this.textSpan.textContent;
             }
-            if (this.scrollPos > this.element.scrollWidth) {
+            updateMaxScroll() {
+                const containerWidth = this.element.clientWidth;
+                const contentWidth = this.textSpan.scrollWidth;
+                this.maxScroll = Math.max(0, contentWidth - containerWidth);
+                if (this.maxScroll <= 0) { this.stop(); this.scrollPos = 0; this.element.scrollLeft = 0; return false; }
+                return true;
+            }
+            start() {
+                if (this.running) return;
+                if (!this.updateMaxScroll()) return;
+                this.running = true;
                 this.scrollPos = -this.element.clientWidth;
+                this.element.scrollLeft = 0;
+                this.lastTimestamp = null;
+                this.rafId = requestAnimationFrame(this.tick.bind(this));
             }
-            this.element.scrollLeft = this.scrollPos;
-        } else {
-            this.updateMaxScroll();
+            tick(timestamp) {
+                if (!this.running) return;
+                if (this.paused) { this.lastTimestamp = timestamp; this.rafId = requestAnimationFrame(this.tick.bind(this)); return; }
+                if (this.lastTimestamp === null) { this.lastTimestamp = timestamp; this.rafId = requestAnimationFrame(this.tick.bind(this)); return; }
+                const delta = (timestamp - this.lastTimestamp) / 1000;
+                this.lastTimestamp = timestamp;
+                let move = this.speed * delta;
+                this.scrollPos += move;
+                if (this.scrollPos >= this.element.scrollWidth) this.scrollPos = -this.element.clientWidth;
+                this.element.scrollLeft = this.scrollPos;
+                this.rafId = requestAnimationFrame(this.tick.bind(this));
+            }
+            pause() { this.paused = true; }
+            resume() { this.paused = false; if (!this.running) this.start(); }
+            stop() { this.running = false; if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; } this.element.scrollLeft = 0; this.scrollPos = 0; }
+            resize() {
+                if (this.running) {
+                    const hasScroll = this.updateMaxScroll();
+                    if (!hasScroll) { this.stop(); return; }
+                    if (this.scrollPos > this.element.scrollWidth) this.scrollPos = -this.element.clientWidth;
+                    this.element.scrollLeft = this.scrollPos;
+                } else this.updateMaxScroll();
+            }
         }
-    }
-}
 
-let resizeTimer = null;
-window.addEventListener('resize', () => {
-    if (resizeTimer) clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        if (window._titleScroller) window._titleScroller.resize();
-        if (window._artistScroller) window._artistScroller.resize();
-        if (window._albumScroller) window._albumScroller.resize();
-    }, 200);
-});
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            if (resizeTimer) clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (window._titleScroller) window._titleScroller.resize();
+                if (window._artistScroller) window._artistScroller.resize();
+                if (window._albumScroller) window._albumScroller.resize();
+            }, 200);
+        });
 
-function hidePlayer() {
-    miniPlayer.style.display = 'none';
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.src = '';
-        currentAudio = null;
-    }
-    coverPreview.style.display = 'none';
-    if (window._titleScroller) { window._titleScroller.stop(); window._titleScroller = null; }
-    if (window._artistScroller) { window._artistScroller.stop(); window._artistScroller = null; }
-    if (window._albumScroller) { window._albumScroller.stop(); window._albumScroller = null; }
-}
-
-function updatePlayerUI() {
-    if (!currentAudio) return;
-    const duration = currentAudio.duration || 0;
-    const current = currentAudio.currentTime || 0;
-    playerProgress.value = duration ? (current / duration) * 100 : 0;
-    playerCurrentTime.textContent = formatTime(current);
-    playerDuration.textContent = formatTime(duration);
-    playerPlayBtn.textContent = currentAudio.paused ? '▶' : '⏸';
-    playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中';
-}
-
-function playSong(cuePath, index, title, coverPath, album, artist, songId) {
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.src = '';
-        currentAudio = null;
-    }
-    currentSongId = songId;  // 记录当前播放的歌曲 ID
-
-    const audioUrl = `/api/audio_segment?cue=${encodeURIComponent(cuePath)}&index=${index}`;
-    const audio = new Audio(audioUrl);
-    currentAudio = audio;
-    showPlayer(title, coverPath, album, artist);
-
-    audio.addEventListener('loadedmetadata', () => {
-        updatePlayerUI();
-        playerStatus.textContent = '加载完成';
-    });
-    audio.addEventListener('timeupdate', updatePlayerUI);
-    audio.addEventListener('play', () => { playerStatus.textContent = '播放中'; updatePlayerUI(); });
-    audio.addEventListener('pause', () => { playerStatus.textContent = '暂停'; updatePlayerUI(); });
-    audio.addEventListener('ended', () => {
-        playerStatus.textContent = '播放结束';
-        updatePlayerUI();
-        if (currentAudio) {
-            currentAudio.pause();
-            currentAudio.currentTime = 0;
-            updatePlayerUI();
-        }
-    });
-    audio.addEventListener('error', (e) => {
-        playerStatus.textContent = '加载失败';
-        console.warn('音频加载失败:', audioUrl, e);
-    });
-
-    audio.play().catch(err => {
-        playerStatus.textContent = '播放失败';
-        console.warn('播放失败:', err);
-    });
-}
-
-playerPlayBtn.addEventListener('click', () => {
-    if (!currentAudio) return;
-    if (currentAudio.paused) {
-        currentAudio.play().catch(() => {});
-    } else {
-        currentAudio.pause();
-    }
-});
-playerStopBtn.addEventListener('click', () => {
-    if (currentAudio) {
-        currentAudio.pause();
-        currentAudio.currentTime = 0;
-        updatePlayerUI();
-        hidePlayer();
-    }
-});
-playerProgress.addEventListener('input', () => {
-    if (!currentAudio) return;
-    const duration = currentAudio.duration;
-    if (duration) {
-        const seekTime = (playerProgress.value / 100) * duration;
-        currentAudio.currentTime = seekTime;
-    }
-});
-
-// ----- 封面悬停预览（未修改） -----
-let previewTimeout = null;
-let lastMouseX = 0, lastMouseY = 0;
-
-function repositionPreview() {
-    const preview = document.getElementById('coverPreview');
-    if (preview.style.display !== 'grid') return;
-    const rect = preview.getBoundingClientRect();
-    const w = rect.width;
-    const h = rect.height;
-    if (w === 0 || h === 0) {
-        requestAnimationFrame(repositionPreview);
-        return;
-    }
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    const offset = 14;
-    let left = lastMouseX + offset;
-    let top = lastMouseY + offset;
-    if (left + w > vw) left = lastMouseX - w - offset;
-    if (top + h > vh) top = lastMouseY - h - offset;
-    if (left < 10) left = 10;
-    if (top < 10) top = 10;
-    if (left + w > vw - 10) left = vw - w - 10;
-    if (top + h > vh - 10) top = vh - h - 10;
-    preview.style.left = left + 'px';
-    preview.style.top = top + 'px';
-}
-
-function showPreview(e) {
-    const preview = document.getElementById('coverPreview');
-    const img = document.getElementById('previewImage');
-    const filename = document.getElementById('previewFilename');
-    const size = document.getElementById('previewSize');
-    const format = document.getElementById('previewFormat');
-    lastMouseX = e.clientX;
-    lastMouseY = e.clientY;
-    if (!currentCoverData.path) {
-        img.src = PLACEHOLDER_SVG;
-        filename.textContent = '占位图 (无封面)';
-        size.textContent = '48×48';
-        format.textContent = 'SVG';
-    } else {
-        const coverSrc = document.getElementById('playerCover').src;
-        img.src = coverSrc;
-        filename.textContent = currentCoverData.name || '未知';
-        const w = currentCoverData.width || 0;
-        const h = currentCoverData.height || 0;
-        size.textContent = w && h ? `${w}×${h}` : '加载中...';
-        format.textContent = currentCoverData.format || '未知';
-    }
-    preview.style.display = 'grid';
-    repositionPreview();
-    img.onload = function() {
-        if (this.naturalWidth) {
-            currentCoverData.width = this.naturalWidth;
-            currentCoverData.height = this.naturalHeight;
-            size.textContent = `${this.naturalWidth}×${this.naturalHeight}`;
-        }
-        repositionPreview();
-    };
-    if (img.complete && img.naturalWidth) {
-        currentCoverData.width = img.naturalWidth;
-        currentCoverData.height = img.naturalHeight;
-        size.textContent = `${img.naturalWidth}×${img.naturalHeight}`;
-        setTimeout(repositionPreview, 20);
-    }
-}
-
-function hidePreview() {
-    const preview = document.getElementById('coverPreview');
-    preview.style.display = 'none';
-    const img = document.getElementById('previewImage');
-    img.onload = null;
-}
-
-const playerCoverEl = document.getElementById('playerCover');
-playerCoverEl.addEventListener('mouseenter', (e) => {
-    clearTimeout(previewTimeout);
-    previewTimeout = setTimeout(() => { showPreview(e); }, 300);
-});
-playerCoverEl.addEventListener('mouseleave', () => {
-    clearTimeout(previewTimeout);
-    previewTimeout = null;
-    hidePreview();
-});
-
-let previewResizeTimer = null;
-window.addEventListener('resize', () => {
-    const preview = document.getElementById('coverPreview');
-    if (preview.style.display === 'grid') {
-        clearTimeout(previewResizeTimer);
-        previewResizeTimer = setTimeout(repositionPreview, 100);
-    }
-});
-window.addEventListener('scroll', () => {
-    const preview = document.getElementById('coverPreview');
-    if (preview.style.display === 'grid') {
-        repositionPreview();
-    }
-}, { passive: true });
-document.addEventListener('mousemove', (e) => {
-    const preview = document.getElementById('coverPreview');
-    if (preview.style.display === 'grid') {
-        lastMouseX = e.clientX;
-        lastMouseY = e.clientY;
-        repositionPreview();
-    }
-});
-
-// ===== 核心函数：构建显示列表 =====
-function buildDisplaySongs(originalSongs, splitMap) {
-    const result = [];
-    for (const song of originalSongs) {
-        const id = song.id;
-        if (splitMap[id] && splitMap[id].length > 0) {
-            // 该条目已拆分出至少一个子条目
-            const subIds = splitMap[id];
-            // 生成子条目
-            for (const subId of subIds) {
-                const cuePath = subId.split('|')[1];
-                if (!cuePath) continue;
-                const idx = song.cueTrackMap[cuePath];
-                if (idx === undefined) continue;
-                const subSong = {
-                    id: subId,
-                    original_titles: song.original_titles,
-                    performers: [song.cueTrackPerformerMap[cuePath] || ''],
-                    cueFiles: [cuePath],
-                    cueTrackMap: { [cuePath]: idx },
-                    cueCoverMap: { [cuePath]: song.cueCoverMap[cuePath] },
-                    cueAlbumMap: { [cuePath]: song.cueAlbumMap[cuePath] },
-                    cueArtistMap: { [cuePath]: song.cueArtistMap[cuePath] },
-                    cueTrackPerformerMap: { [cuePath]: song.cueTrackPerformerMap[cuePath] || '' },
-                    cueTrackTitleMap: { [cuePath]: song.cueTrackTitleMap[cuePath] || song.original_titles[0] },
-                    audioFile: song.audioFile,
-                    cueRef: cuePath,
-                    trackIndex: idx,
-                    cover: song.cueCoverMap[cuePath] || null,
-                    path: cuePath,
-                    _isSplit: true,
-                    _parentId: id,
+        function showPlayer(title, coverPath, album, artist) {
+            miniPlayer.style.display = 'block';
+            const titleText = title || '未知歌曲';
+            playerTitle.innerHTML = `<span class="scroll-text">${titleText}</span>`;
+            playerTitle.title = titleText;
+            const artistText = artist && artist.trim() ? artist : '未知歌手';
+            const albumText = album && album.trim() ? album : '未知专辑';
+            playerArtist.innerHTML = `<span class="scroll-text">${artistText}</span>`;
+            playerArtist.title = artistText;
+            playerAlbum.innerHTML = `<span class="scroll-text">${albumText}</span>`;
+            playerAlbum.title = albumText;
+            currentSongTitle = titleText;
+            if (coverPath) {
+                playerCover.src = `/api/cover?path=${encodeURIComponent(coverPath)}`;
+                const parts = coverPath.split(/[\\/]/);
+                const filename = parts[parts.length - 1] || 'cover';
+                const ext = filename.includes('.') ? filename.split('.').pop().toUpperCase() : '未知';
+                currentCoverData = { path: coverPath, name: filename, format: ext, width: 0, height: 0 };
+                playerCover.style.display = 'block';
+            } else {
+                playerCover.src = PLACEHOLDER_SVG;
+                currentCoverData = { path: '', name: '占位图', format: 'SVG', width: 48, height: 48 };
+                playerCover.style.display = 'block';
+            }
+            playerCover.onload = null;
+            if (coverPath) {
+                playerCover.onload = function() {
+                    const w = this.naturalWidth || 0;
+                    const h = this.naturalHeight || 0;
+                    if (w && h) { currentCoverData.width = w; currentCoverData.height = h; }
                 };
-                result.push(subSong);
-            }
-            // 计算剩余来源（未拆分的）
-            const splitCues = subIds.map(sid => sid.split('|')[1]);
-            const remainingCues = song.cueFiles.filter(c => !splitCues.includes(c));
-            if (remainingCues.length > 0) {
-                const remainingSong = { ...song };
-                remainingSong.cueFiles = remainingCues;
-                remainingSong.cueTrackMap = {};
-                remainingSong.cueCoverMap = {};
-                remainingSong.cueAlbumMap = {};
-                remainingSong.cueArtistMap = {};
-                remainingSong.cueTrackPerformerMap = {};
-                remainingSong.cueTrackTitleMap = {};
-                remainingSong.performers = [];
-                for (const c of remainingCues) {
-                    remainingSong.cueTrackMap[c] = song.cueTrackMap[c];
-                    remainingSong.cueCoverMap[c] = song.cueCoverMap[c];
-                    remainingSong.cueAlbumMap[c] = song.cueAlbumMap[c];
-                    remainingSong.cueArtistMap[c] = song.cueArtistMap[c];
-                    remainingSong.cueTrackPerformerMap[c] = song.cueTrackPerformerMap[c] || '';
-                    remainingSong.cueTrackTitleMap[c] = song.cueTrackTitleMap[c] || song.original_titles[0];
-                    const perf = song.cueTrackPerformerMap[c] || '';
-                    if (perf && !remainingSong.performers.includes(perf)) remainingSong.performers.push(perf);
+                if (playerCover.complete && playerCover.naturalWidth) {
+                    currentCoverData.width = playerCover.naturalWidth;
+                    currentCoverData.height = playerCover.naturalHeight;
                 }
-                remainingSong.cueRef = remainingCues[0];
-                remainingSong.trackIndex = song.cueTrackMap[remainingCues[0]];
-                remainingSong.cover = song.cueCoverMap[remainingCues[0]] || null;
-                remainingSong.path = remainingCues[0];
-                remainingSong._isSplit = false;
-                remainingSong._parentId = undefined;
-                result.push(remainingSong);
             }
-            // 如果剩余来源为0，则不添加原条目
-        } else {
-            // 未拆分
-            result.push({ ...song, _isSplit: false });
+            if (window._titleScroller) { window._titleScroller.stop(); window._titleScroller = null; }
+            if (window._artistScroller) { window._artistScroller.stop(); window._artistScroller = null; }
+            if (window._albumScroller) { window._albumScroller.stop(); window._albumScroller = null; }
+            window._titleScroller = new ScrollManager(playerTitle);
+            window._artistScroller = new ScrollManager(playerArtist);
+            window._albumScroller = new ScrollManager(playerAlbum);
+            window._titleScroller.start();
+            window._artistScroller.start();
+            window._albumScroller.start();
+            playerTitle.addEventListener('mouseenter', () => { if (window._titleScroller) window._titleScroller.pause(); });
+            playerTitle.addEventListener('mouseleave', () => { if (window._titleScroller) window._titleScroller.resume(); });
+            playerArtist.addEventListener('mouseenter', () => { if (window._artistScroller) window._artistScroller.pause(); });
+            playerArtist.addEventListener('mouseleave', () => { if (window._artistScroller) window._artistScroller.resume(); });
+            playerAlbum.addEventListener('mouseenter', () => { if (window._albumScroller) window._albumScroller.pause(); });
+            playerAlbum.addEventListener('mouseleave', () => { if (window._albumScroller) window._albumScroller.resume(); });
         }
-    }
-    return result;
-}
 
-// ===== 拆分模态框相关（核心修改） =====
-function openSplitModal(parentId) {
-    const original = state.songs.find(s => s.id === parentId);
-    if (!original) return;
-    // 获取所有来源
-    const allCues = original.cueFiles;
-    // 获取已拆分的来源（如果有）
-    let splitCues = [];
-    if (state.splitMap[parentId]) {
-        splitCues = state.splitMap[parentId].map(sid => sid.split('|')[1]);
-    }
-    // 过滤出尚未拆分的来源
-    const availableCues = allCues.filter(c => !splitCues.includes(c));
-    if (availableCues.length === 0) {
-        alert('该条目所有来源均已拆分，无法再拆分。');
-        return;
-    }
-
-    state._pendingSplitParentId = parentId;
-    // 构建列表（默认不勾选）
-    let listHtml = '';
-    availableCues.forEach(cue => {
-        const perf = original.cueTrackPerformerMap[cue] || '';
-        const title = original.cueTrackTitleMap[cue] || original.original_titles[0];
-        listHtml += `
-            <li>
-                <input type="checkbox" data-cue="${escapeHtml(cue)}" />
-                <span class="cue-info">${escapeHtml(cue)}</span>
-                <span class="perf-info">${perf ? '🎤 ' + escapeHtml(perf) : ''}</span>
-                <span style="color:#94a3b8;font-size:12px;">${escapeHtml(title)}</span>
-            </li>
-        `;
-    });
-    sourceList.innerHTML = listHtml;
-    splitModal.style.display = 'flex';
-}
-
-function confirmSplit() {
-    const parentId = state._pendingSplitParentId;
-    if (!parentId) return;
-    const original = state.songs.find(s => s.id === parentId);
-    if (!original) return;
-
-    // 获取选中的来源
-    const checkboxes = sourceList.querySelectorAll('input[type="checkbox"]:checked');
-    const selectedCues = Array.from(checkboxes).map(cb => cb.dataset.cue);
-    if (selectedCues.length === 0) {
-        alert('请至少选择一个来源进行拆分。');
-        return;
-    }
-
-    // 获取已拆分的来源
-    let existingSplitCues = [];
-    if (state.splitMap[parentId]) {
-        existingSplitCues = state.splitMap[parentId].map(sid => sid.split('|')[1]);
-    }
-    // 合并已拆分的和新选中的
-    const allSplitCues = [...existingSplitCues, ...selectedCues];
-    const subIds = allSplitCues.map(cue => `${parentId}|${cue}`);
-    state.splitMap[parentId] = subIds;
-
-    // 处理选中状态
-    if (state.selected.has(parentId)) {
-        state.selected.delete(parentId);
-        // 只选中新拆出的子条目（已存在的子条目可能已经选中，避免重复）
-        for (const sid of subIds) {
-            state.selected.add(sid);
+        function updatePlayerUI() {
+            if (!currentAudio) return;
+            const duration = currentAudio.duration || 0;
+            const current = currentAudio.currentTime || 0;
+            playerProgress.value = duration ? (current / duration) * 100 : 0;
+            playerCurrentTime.textContent = formatTime(current);
+            playerDuration.textContent = formatTime(duration);
+            playerPlayBtn.textContent = currentAudio.paused ? '▶' : '⏸';
+            playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中';
         }
-    } else {
-        // 如果父条目未选中，但可能有些子条目已经选中，保持
-    }
 
-    state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
-    saveState();
-    updateUI();
-    closeModal();
-}
-
-function mergeBack(subId) {
-    const subSong = state.displaySongs.find(s => s.id === subId);
-    if (!subSong || !subSong._parentId) {
-        alert('无法找到父条目信息。');
-        return;
-    }
-    const parentId = subSong._parentId;
-    if (state.splitMap[parentId]) {
-        state.splitMap[parentId] = state.splitMap[parentId].filter(id => id !== subId);
-        if (state.splitMap[parentId].length === 0) {
-            delete state.splitMap[parentId];
+        function cleanupAudio(audio) {
+            if (!audio) return;
+            if (audioController) { try { audioController.abort(); } catch (_) {} audioController = null; }
+            audio.onloadedmetadata = null;
+            audio.ontimeupdate = null;
+            audio.onplay = null;
+            audio.onpause = null;
+            audio.onended = null;
+            audio.onerror = null;
+            try { audio.pause(); } catch (_) {}
+            try { audio.src = ''; } catch (_) {}
+            try { audio.load(); } catch (_) {}
+            if (currentAudio === audio) currentAudio = null;
         }
-    } else {
-        alert('父条目已不存在，无法合并。');
-        return;
-    }
-    if (state.selected.has(subId)) {
-        state.selected.delete(subId);
-        // 如果父条目存在且未选中，选中父条目
-        const parentExists = state.displaySongs.some(s => s.id === parentId);
-        if (parentExists) {
-            state.selected.add(parentId);
+
+        function hidePlayer() {
+            if (currentAudio) { cleanupAudio(currentAudio); currentAudio = null; }
+            miniPlayer.style.display = 'none';
+            coverPreview.style.display = 'none';
+            if (window._titleScroller) { window._titleScroller.stop(); window._titleScroller = null; }
+            if (window._artistScroller) { window._artistScroller.stop(); window._artistScroller = null; }
+            if (window._albumScroller) { window._albumScroller.stop(); window._albumScroller = null; }
+            playerStatus.textContent = '已停止';
+            currentSongId = null;
+            isAdvancing = false;
         }
-    }
-    state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
-    saveState();
-    updateUI();
-}
 
-function closeModal() {
-    splitModal.style.display = 'none';
-    state._pendingSplitParentId = null;
-}
-
-modalConfirmBtn.addEventListener('click', confirmSplit);
-modalCancelBtn.addEventListener('click', closeModal);
-modalCloseBtn.addEventListener('click', closeModal);
-splitModal.addEventListener('click', (e) => {
-    if (e.target === splitModal) closeModal();
-});
-
-// ----- LocalStorage -----
-const STORAGE_KEY = 'cue_tool_state';
-function saveState() {
-    const data = {
-        dirs: state.dirs,
-        selected: Array.from(state.selected),
-        splitMap: state.splitMap,
-        version: 3,
-    };
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
-}
-function loadState() {
-    try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return null;
-        return JSON.parse(raw);
-    } catch (e) { return null; }
-}
-function restoreState() {
-    const saved = loadState();
-    if (!saved) return false;
-    state.dirs = saved.dirs || [];
-    state._pendingSelected = new Set(saved.selected || []);
-    state.splitMap = saved.splitMap || {};
-    renderDirs();
-    return true;
-}
-function restoreSelectedAfterScan() {
-    if (!state._pendingSelected) return;
-    const validIds = new Set(state.displaySongs.map(s => s.id));
-    for (const id of state._pendingSelected) {
-        if (validIds.has(id)) state.selected.add(id);
-    }
-    state._pendingSelected = null;
-    updateUI();
-    saveState();
-}
-
-function escapeHtml(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
-
-// ----- 目录管理（未修改） -----
-function addDirectoryInternal(path) {
-    if (!path) return false;
-    if (state.dirs.includes(path)) {
-        scanStatus.textContent = `⚠️ 目录已存在: ${path}`;
-        scanStatus.style.color = '#f59e0b';
-        return false;
-    }
-    state.dirs.push(path);
-    renderDirs();
-    scanStatus.textContent = `已添加目录: ${path}`;
-    scanStatus.style.color = '#10b981';
-    saveState();
-    return true;
-}
-function renderDirs() {
-    if (state.dirs.length === 0) {
-        dirList.innerHTML = '<span style="color:#94a3b8;font-size:13px;">还没有添加目录</span>';
-        return;
-    }
-    dirList.innerHTML = state.dirs.map((d, i) => `
-        <span class="dir-tag">
-            ${escapeHtml(d)}
-            <span class="del" data-index="${i}">✕</span>
-        </span>
-    `).join('');
-    dirList.querySelectorAll('.del').forEach(el => {
-        el.addEventListener('click', (e) => {
-            const idx = parseInt(e.target.dataset.index);
-            state.dirs.splice(idx, 1);
-            renderDirs();
-            state.songs = [];
-            state.displaySongs = [];
-            state.selected.clear();
-            state.splitMap = {};
-            renderSongs();
-            updateSelectedPanel();
-            scanStatus.textContent = '目录已更新，请重新扫描';
-            saveState();
-            hidePlayer();
-        });
-    });
-}
-async function browseDirectory() {
-    scanStatus.textContent = '⏳ 正在打开文件夹选择窗口...';
-    scanStatus.style.color = '#475569';
-    try {
-        const resp = await fetch('/api/browse');
-        const data = await resp.json();
-        if (!data.success) {
-            scanStatus.textContent = '❌ ' + (data.error || '选择失败');
-            scanStatus.style.color = '#ef4444';
-            return;
+        function buildPlaylistItems(songList) {
+            return songList.map(s => {
+                const cue = s.cueFiles && s.cueFiles.length > 0 ? s.cueFiles[0] : null;
+                if (!cue) return null;
+                const idx = s.cueTrackMap ? s.cueTrackMap[cue] : 0;
+                const cover = s.cueCoverMap ? s.cueCoverMap[cue] : '';
+                const album = s.cueAlbumMap ? s.cueAlbumMap[cue] : '';
+                const artist = s.cueTrackPerformerMap ? s.cueTrackPerformerMap[cue] : '';
+                const title = s.cueTrackTitleMap ? s.cueTrackTitleMap[cue] : (s.original_titles ? s.original_titles[0] : s.id);
+                return { cue, index: idx, title, cover, album, artist, songId: s.id };
+            }).filter(item => item !== null);
         }
-        const path = data.path;
-        newDirInput.value = path;
-        const added = addDirectoryInternal(path);
-        if (added) newDirInput.value = '';
-        newDirInput.focus();
-        newDirInput.select();
-    } catch (err) {
-        scanStatus.textContent = '❌ 请求失败: ' + err.message;
-        scanStatus.style.color = '#ef4444';
-    }
-}
-function addDirectory() {
-    const path = newDirInput.value.trim();
-    if (!path) {
-        scanStatus.textContent = '⚠️ 请输入目录路径';
-        scanStatus.style.color = '#ef4444';
-        return;
-    }
-    if (addDirectoryInternal(path)) newDirInput.value = '';
-}
 
-// ----- 扫描 -----
-async function scanAll() {
-    if (state.dirs.length === 0) {
-        scanStatus.textContent = '⚠️ 请先添加至少一个目录';
-        scanStatus.style.color = '#ef4444';
-        return;
-    }
-    scanStatus.textContent = '⏳ 正在扫描...';
-    scanStatus.style.color = '#475569';
-    scanAllBtn.disabled = true;
-    scanAllBtn.innerHTML = '<span class="spinner"></span> 扫描中';
-    try {
-        const resp = await fetch('/api/scan', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ dirs: state.dirs })
-        });
-        const data = await resp.json();
-        if (!data.success) {
-            scanStatus.textContent = '❌ ' + (data.error || '扫描失败');
-            scanStatus.style.color = '#ef4444';
-            return;
-        }
-        state.songs = data.songs || [];
-        state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
-        restoreSelectedAfterScan();
-        if (state.displaySongs.length === 0) {
-            scanStatus.textContent = '⚠️ 未找到任何歌曲，请检查目录路径是否正确';
-            scanStatus.style.color = '#f59e0b';
-        } else {
-            const splitCount = Object.keys(state.splitMap).length;
-            scanStatus.textContent = `✅ 扫描完成，共 ${state.displaySongs.length} 首歌曲（合并后 ${state.songs.length} 组，已拆分 ${splitCount} 组），来自 ${data.cueCount || 0} 个 CUE 文件`;
-            scanStatus.style.color = '#10b981';
-        }
-        saveState();
-        updateUI();
-        hidePlayer();
-    } catch (err) {
-        scanStatus.textContent = '❌ 请求失败: ' + err.message;
-        scanStatus.style.color = '#ef4444';
-    } finally {
-        scanAllBtn.disabled = false;
-        scanAllBtn.innerHTML = '🔍 扫描全部';
-    }
-}
-
-// ----- 渲染歌曲列表 -----
-function renderSongs() {
-    const search = state.searching.trim().toLowerCase();
-    let filtered = state.displaySongs;
-    if (search) {
-        filtered = state.displaySongs.filter(s => {
-            const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-            const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-            return origMatch || performerMatch;
-        });
-    }
-    if (state.displaySongs.length === 0) {
-        songList.innerHTML = `<div class="empty-msg">📂 请添加目录并扫描</div>`;
-        countDisplay.innerHTML = '共 <strong>0</strong> 首';
-        headerCheckbox.checked = false;
-        return;
-    }
-    if (filtered.length === 0) {
-        songList.innerHTML = `<div class="empty-msg">🔍 没有匹配 "${escapeHtml(state.searching)}" 的歌曲</div>`;
-        countDisplay.innerHTML = `共 <strong>${state.displaySongs.length}</strong> 首`;
-        headerCheckbox.checked = false;
-        return;
-    }
-
-    let html = '';
-    for (const song of filtered) {
-        const checked = state.selected.has(song.id) ? 'checked' : '';
-        const sources = song.cueFiles || [song.path];
-        const originals = song.original_titles || [];
-        const mainTitle = originals.length > 0 ? originals[0] : song.id;
-        const altTitles = originals.slice(1).filter(t => t !== mainTitle);
-        const cueTrackMap = song.cueTrackMap || {};
-        const cueCoverMap = song.cueCoverMap || {};
-        const cueAlbumMap = song.cueAlbumMap || {};
-        const cueTrackPerformerMap = song.cueTrackPerformerMap || {};
-        const cueTrackTitleMap = song.cueTrackTitleMap || {};
-
-        // 判断是否为可拆分的合并条目（剩余来源数量 >1 且未完全拆分）
-        const original = state.songs.find(s => s.id === song.id);
-        let isMerged = false;
-        if (original && !song._isSplit) {
-            // 检查剩余来源数量是否 > 1
-            const remainingCues = song.cueFiles || [];
-            if (remainingCues.length > 1) {
-                isMerged = true;
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
             }
-        }
-        const isSplit = song._isSplit === true;
-
-        let sourcesHtml = '';
-        for (const cue of sources) {
-            const idx = cueTrackMap[cue];
-            const hasTrack = idx !== undefined;
-            const coverForCue = cueCoverMap[cue] || '';
-            const albumForCue = cueAlbumMap[cue] || '';
-            const performerForCue = cueTrackPerformerMap[cue] || '';
-            const rawTitle = cueTrackTitleMap[cue] || mainTitle;
-
-            const playBtn = hasTrack
-                ? `<button class="play-btn" data-cue="${escapeHtml(cue)}" data-index="${idx}" data-song-id="${escapeHtml(song.id)}" data-title="${escapeHtml(rawTitle)}" data-cover="${escapeHtml(coverForCue)}" data-album="${escapeHtml(albumForCue)}" data-artist="${escapeHtml(performerForCue)}" title="播放此来源的曲目片段">▶</button>`
-                : '';
-
-            const performerTag = performerForCue
-                ? `<span class="performer-tag" title="${escapeHtml(performerForCue)}">🎤 ${escapeHtml(performerForCue)}</span>`
-                : '';
-
-            sourcesHtml += `<span class="cue-path" data-path="${escapeHtml(cue)}">
-                <span class="cue-file">${escapeHtml(cue)}</span>
-                ${performerTag}
-                ${playBtn}
-            </span>`;
+            return arr;
         }
 
-        // 拆分按钮：仅在合并条目且剩余来源>=2时显示
-        const splitBtnHtml = (isMerged)
-            ? `<button class="split-btn" data-id="${song.id}" title="拆分为独立版本（每个来源一首）">✂️</button>`
-            : '';
-        const mergeBtnHtml = (isSplit)
-            ? `<button class="merge-btn" data-id="${song.id}" title="合并回父条目">↺</button>`
-            : '';
+        // ===== 核心播放函数 =====
+        function playSong(cuePath, index, title, coverPath, album, artist, songId, startPlaylist = true, isUserAction = true) {
+            if (currentAudio) { cleanupAudio(currentAudio); currentAudio = null; }
+            isAdvancing = false;
+            if (startPlaylist) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                state.playlist = buildPlaylistItems(available);
+                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
+                let pos = state.playlist.findIndex(item => item.songId === songId);
+                if (pos === -1) {
+                    state.playlist.push({ cue: cuePath, index, title, cover: coverPath, album, artist, songId });
+                    pos = state.playlist.length - 1;
+                }
+                state.playIndex = pos;
+            } else {
+                if (state.playlist.length === 0) {
+                    const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                    state.playlist = buildPlaylistItems(available);
+                    if (state.playMode === 'shuffle') shuffleArray(state.playlist);
+                }
+                let pos = state.playlist.findIndex(item => item.songId === songId);
+                if (pos === -1) {
+                    state.playlist.push({ cue: cuePath, index, title, cover: coverPath, album, artist, songId });
+                    pos = state.playlist.length - 1;
+                }
+                state.playIndex = pos;
+            }
+            const playItem = state.playlist[state.playIndex];
+            if (!playItem) { playerStatus.textContent = '无有效播放项'; return; }
+            const audioUrl = `/api/audio_segment?cue=${encodeURIComponent(playItem.cue)}&index=${playItem.index}`;
+            const audio = new Audio(audioUrl);
+            currentAudio = audio;
+            currentSongId = playItem.songId;
+            showPlayer(playItem.title, playItem.cover, playItem.album, playItem.artist);
+            audioController = new AbortController();
+            const { signal } = audioController;
+            audio.addEventListener('loadedmetadata', function() { updatePlayerUI(); playerStatus.textContent = '加载完成'; }, { signal });
+            audio.addEventListener('timeupdate', updatePlayerUI, { signal });
+            audio.addEventListener('play', function() { playerStatus.textContent = '播放中'; updatePlayerUI(); }, { signal });
+            audio.addEventListener('pause', function() { playerStatus.textContent = '暂停'; updatePlayerUI(); }, { signal });
+            audio.addEventListener('ended', function() { if (!currentAudio || currentAudio !== audio) return; handlePlaybackEnded(); }, { signal });
+            audio.addEventListener('error', function(e) {
+                if (!currentAudio || currentAudio !== audio) return;
+                if (isUserAction) { playerStatus.textContent = '加载失败'; console.warn('[播放] 用户操作触发错误:', audioUrl, e); }
+                else { console.warn('[播放] 自动播放错误，尝试跳转:', audioUrl, e); if (!isAdvancing) handlePlaybackEnded(); else playerStatus.textContent = '加载失败（已跳过）'; }
+            }, { signal });
+            audio.play().catch(err => {
+                if (!currentAudio || currentAudio !== audio) return;
+                if (isUserAction) { playerStatus.textContent = '播放失败'; console.warn('[播放] 用户操作播放失败:', err); }
+                else { console.warn('[播放] 自动播放失败，尝试跳转:', err); if (!isAdvancing) handlePlaybackEnded(); else playerStatus.textContent = '播放失败（已跳过）'; }
+            });
+        }
 
-        const splitLabel = isSplit ? ' [拆]' : '';
-
-        html += `
-            <div class="song-item" data-id="${song.id}">
-                <input type="checkbox" class="song-checkbox" data-id="${song.id}" ${checked} />
-                <div class="info">
-                    <div class="title">${escapeHtml(mainTitle)}${splitLabel} ${splitBtnHtml} ${mergeBtnHtml}</div>
-                    ${altTitles.length > 0 ? `<div class="alt-titles">${altTitles.map(t => `<span class="alt">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
-                    <div class="sources">${sourcesHtml}</div>
-                </div>
-            </div>
-        `;
-    }
-    songList.innerHTML = html;
-
-    // 事件绑定
-    songList.querySelectorAll('.play-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const cuePath = btn.dataset.cue;
-            const index = parseInt(btn.dataset.index);
-            const title = btn.dataset.title || '未知歌曲';
-            const cover = btn.dataset.cover || '';
-            const album = btn.dataset.album || '';
-            const artist = btn.dataset.artist || '';
-            const songId = btn.dataset.songId; // 新增
-            if (!cuePath || isNaN(index)) {
-                console.warn('缺少 cue 或 index');
+        // ===== 播放结束处理 =====
+        function handlePlaybackEnded() {
+            if (isAdvancing) { console.warn('[播放] 已处于跳转中，忽略重复调用'); return; }
+            if (!currentAudio) { playerStatus.textContent = '播放结束'; return; }
+            const mode = state.playMode;
+            if (mode === 'single') { playerStatus.textContent = '播放结束'; return; }
+            if (mode === 'repeat-one') {
+                isAdvancing = true;
+                const item = state.playlist[state.playIndex];
+                if (item && currentAudio) {
+                    try { currentAudio.currentTime = 0; currentAudio.play().catch(() => { const idx = item.index; const cue = item.cue; const title = item.title; const cover = item.cover; const album = item.album; const artist = item.artist; const songId = item.songId; playSong(cue, idx, title, cover, album, artist, songId, false, false); }); }
+                    catch (_) { const idx = item.index; const cue = item.cue; const title = item.title; const cover = item.cover; const album = item.album; const artist = item.artist; const songId = item.songId; playSong(cue, idx, title, cover, album, artist, songId, false, false); }
+                } else {
+                    const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                    state.playlist = buildPlaylistItems(available);
+                    if (state.playlist.length > 0) { state.playIndex = 0; const first = state.playlist[0]; playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, false, false); }
+                }
+                isAdvancing = false;
                 return;
             }
-            playSong(cuePath, index, title, cover, album, artist, songId);
+            // sequential 或 shuffle
+            const nextIdx = state.playIndex + 1;
+            if (nextIdx >= state.playlist.length) {
+                if (mode === 'shuffle') {
+                    // 随机模式：不重新打乱，从头开始循环
+                    state.playIndex = 0;
+                    const nextItem = state.playlist[0];
+                    if (nextItem) { playSong(nextItem.cue, nextItem.index, nextItem.title, nextItem.cover, nextItem.album, nextItem.artist, nextItem.songId, false, false); }
+                    else playerStatus.textContent = '播放结束';
+                    return;
+                } else { playerStatus.textContent = '播放结束'; return; }
+            }
+            isAdvancing = true;
+            state.playIndex = nextIdx;
+            const nextItem = state.playlist[nextIdx];
+            if (nextItem) { playSong(nextItem.cue, nextItem.index, nextItem.title, nextItem.cover, nextItem.album, nextItem.artist, nextItem.songId, false, false); }
+            else { isAdvancing = false; playerStatus.textContent = '播放结束'; }
+        }
+
+        // ===== 上一首（循环到末尾）=====
+        function playPrev() {
+            if (state.playlist.length === 0) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                state.playlist = buildPlaylistItems(available);
+                if (state.playlist.length === 0) { playerStatus.textContent = '播放列表为空'; return; }
+                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
+                state.playIndex = 0;
+                const first = state.playlist[0];
+                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
+                return;
+            }
+            let prevIdx = state.playIndex - 1;
+            if (prevIdx < 0) {
+                prevIdx = state.playlist.length - 1;
+            }
+            state.playIndex = prevIdx;
+            const item = state.playlist[prevIdx];
+            if (item) {
+                playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
+            }
+        }
+
+        // ===== 下一首 =====
+        function playNext() {
+            if (state.playlist.length === 0) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                state.playlist = buildPlaylistItems(available);
+                if (state.playlist.length === 0) { playerStatus.textContent = '播放列表为空'; return; }
+                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
+                state.playIndex = 0;
+                const first = state.playlist[0];
+                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
+                return;
+            }
+            let nextIdx = state.playIndex + 1;
+            if (nextIdx >= state.playlist.length) {
+                if (state.playMode === 'shuffle') {
+                    // 随机模式：不重新打乱，从头循环
+                    state.playIndex = 0;
+                    const item = state.playlist[0];
+                    if (item) playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
+                    else playerStatus.textContent = '播放列表为空';
+                    return;
+                } else {
+                    playerStatus.textContent = '已是最后一首';
+                    return;
+                }
+            }
+            state.playIndex = nextIdx;
+            const item = state.playlist[nextIdx];
+            if (item) playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
+        }
+
+        // ===== 播放器按钮事件 =====
+        document.getElementById('playerModeBtn').addEventListener('click', function() {
+            const modes = ['single', 'sequential', 'repeat-one', 'shuffle'];
+            const icons = ['▶1', '🔁', '🔂', '🎲'];
+            const titles = ['单曲播放', '顺序播放', '单曲循环', '随机播放'];
+            let idx = modes.indexOf(state.playMode);
+            idx = (idx + 1) % modes.length;
+            const newMode = modes[idx];
+            // 如果切换到 shuffle 且当前有播放列表和当前歌曲
+            if (newMode === 'shuffle' && state.playlist.length > 0 && currentSongId) {
+                const currentItem = state.playlist[state.playIndex];
+                if (currentItem) {
+                    const filtered = state.playlist.filter(item => item.songId !== currentSongId);
+                    shuffleArray(filtered);
+                    const newList = [currentItem, ...filtered];
+                    state.playlist = newList;
+                    state.playIndex = 0;
+                    if (!currentAudio || currentAudio.ended) {
+                        playSong(currentItem.cue, currentItem.index, currentItem.title, currentItem.cover, currentItem.album, currentItem.artist, currentItem.songId, false, true);
+                    } else {
+                        playerStatus.textContent = '随机模式已切换';
+                    }
+                }
+            } else if (newMode === 'shuffle' && state.playlist.length > 0 && !currentSongId) {
+                shuffleArray(state.playlist);
+                state.playIndex = 0;
+                const first = state.playlist[0];
+                if (first) playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, false, true);
+            }
+            state.playMode = newMode;
+            this.textContent = icons[idx];
+            this.title = titles[idx];
         });
-    });
-    songList.querySelectorAll('.split-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            if (id) {
-                openSplitModal(id);
+
+        document.getElementById('playerPrevBtn').addEventListener('click', function() {
+            if (state.playlist.length === 0) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                state.playlist = buildPlaylistItems(available);
+                if (state.playlist.length === 0) { alert('播放列表为空'); return; }
+                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
+                state.playIndex = 0;
+                const first = state.playlist[0];
+                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
+                return;
+            }
+            playPrev();
+        });
+
+        document.getElementById('playerNextBtn').addEventListener('click', function() {
+            if (state.playlist.length === 0) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                state.playlist = buildPlaylistItems(available);
+                if (state.playlist.length === 0) { alert('播放列表为空'); return; }
+                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
+                state.playIndex = 0;
+                const first = state.playlist[0];
+                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
+                return;
+            }
+            playNext();
+        });
+
+        playerPlayBtn.addEventListener('click', () => {
+            if (!currentAudio) {
+                if (state.playlist.length === 0) { const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0); state.playlist = buildPlaylistItems(available); if (state.playMode === 'shuffle') shuffleArray(state.playlist); }
+                if (state.playlist.length > 0) { const first = state.playlist[0]; playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true); }
+                return;
+            }
+            if (currentAudio.paused) currentAudio.play().catch(() => {});
+            else currentAudio.pause();
+        });
+
+        playerStopBtn.addEventListener('click', () => { hidePlayer(); state.playlist = []; state.playIndex = -1; playerStatus.textContent = '已停止'; });
+
+        playerProgress.addEventListener('input', () => {
+            if (!currentAudio) return;
+            const duration = currentAudio.duration;
+            if (duration) { const seekTime = (playerProgress.value / 100) * duration; currentAudio.currentTime = seekTime; }
+        });
+
+        // ===== 封面预览浮窗（完整实现）=====
+        let previewTimeout = null;
+        let lastMouseX = 0, lastMouseY = 0;
+
+        function repositionPreview() {
+            const preview = document.getElementById('coverPreview');
+            if (preview.style.display !== 'grid') return;
+            const rect = preview.getBoundingClientRect();
+            const w = rect.width;
+            const h = rect.height;
+            if (w === 0 || h === 0) { requestAnimationFrame(repositionPreview); return; }
+            const vw = window.innerWidth;
+            const vh = window.innerHeight;
+            const offset = 14;
+            let left = lastMouseX + offset;
+            let top = lastMouseY + offset;
+            if (left + w > vw) left = lastMouseX - w - offset;
+            if (top + h > vh) top = lastMouseY - h - offset;
+            if (left < 10) left = 10;
+            if (top < 10) top = 10;
+            if (left + w > vw - 10) left = vw - w - 10;
+            if (top + h > vh - 10) top = vh - h - 10;
+            preview.style.left = left + 'px';
+            preview.style.top = top + 'px';
+        }
+
+        function showPreview(e) {
+            const preview = document.getElementById('coverPreview');
+            const img = document.getElementById('previewImage');
+            const filename = document.getElementById('previewFilename');
+            const size = document.getElementById('previewSize');
+            const format = document.getElementById('previewFormat');
+            lastMouseX = e.clientX;
+            lastMouseY = e.clientY;
+            if (!currentCoverData.path) {
+                img.src = PLACEHOLDER_SVG;
+                filename.textContent = '占位图 (无封面)';
+                size.textContent = '48×48';
+                format.textContent = 'SVG';
+            } else {
+                const coverSrc = document.getElementById('playerCover').src;
+                img.src = coverSrc;
+                filename.textContent = currentCoverData.name || '未知';
+                const w = currentCoverData.width || 0;
+                const h = currentCoverData.height || 0;
+                size.textContent = w && h ? `${w}×${h}` : '加载中...';
+                format.textContent = currentCoverData.format || '未知';
+            }
+            preview.style.display = 'grid';
+            repositionPreview();
+            img.onload = function() {
+                if (this.naturalWidth) {
+                    currentCoverData.width = this.naturalWidth;
+                    currentCoverData.height = this.naturalHeight;
+                    size.textContent = `${this.naturalWidth}×${this.naturalHeight}`;
+                }
+                repositionPreview();
+            };
+            if (img.complete && img.naturalWidth) {
+                currentCoverData.width = img.naturalWidth;
+                currentCoverData.height = img.naturalHeight;
+                size.textContent = `${img.naturalWidth}×${img.naturalHeight}`;
+                setTimeout(repositionPreview, 20);
+            }
+        }
+
+        function hidePreview() {
+            const preview = document.getElementById('coverPreview');
+            preview.style.display = 'none';
+            const img = document.getElementById('previewImage');
+            img.onload = null;
+        }
+
+        const playerCoverEl = document.getElementById('playerCover');
+        playerCoverEl.addEventListener('mouseenter', (e) => {
+            clearTimeout(previewTimeout);
+            previewTimeout = setTimeout(() => { showPreview(e); }, 300);
+        });
+        playerCoverEl.addEventListener('mouseleave', () => {
+            clearTimeout(previewTimeout);
+            previewTimeout = null;
+            hidePreview();
+        });
+
+        let previewResizeTimer = null;
+        window.addEventListener('resize', () => {
+            const preview = document.getElementById('coverPreview');
+            if (preview.style.display === 'grid') {
+                clearTimeout(previewResizeTimer);
+                previewResizeTimer = setTimeout(repositionPreview, 100);
             }
         });
-    });
-    songList.querySelectorAll('.merge-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const id = btn.dataset.id;
-            if (id) {
-                mergeBack(id);
+        window.addEventListener('scroll', () => {
+            const preview = document.getElementById('coverPreview');
+            if (preview.style.display === 'grid') {
+                repositionPreview();
+            }
+        }, { passive: true });
+        document.addEventListener('mousemove', (e) => {
+            const preview = document.getElementById('coverPreview');
+            if (preview.style.display === 'grid') {
+                lastMouseX = e.clientX;
+                lastMouseY = e.clientY;
+                repositionPreview();
             }
         });
-    });
-    songList.querySelectorAll('.song-checkbox').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-            const id = e.target.dataset.id;
-            if (e.target.checked) state.selected.add(id);
-            else state.selected.delete(id);
+
+        // ===== 核心数据构建 =====
+        function buildDisplaySongs(originalSongs, splitMap) {
+            const result = [];
+            for (const song of originalSongs) {
+                const id = song.id;
+                if (splitMap[id] && splitMap[id].length > 0) {
+                    const subIds = splitMap[id];
+                    for (const subId of subIds) {
+                        const cuePath = subId.split('|')[1];
+                        if (!cuePath) continue;
+                        const idx = song.cueTrackMap[cuePath];
+                        if (idx === undefined) continue;
+                        const subSong = {
+                            id: subId,
+                            original_titles: song.original_titles,
+                            performers: [song.cueTrackPerformerMap[cuePath] || ''],
+                            cueFiles: [cuePath],
+                            cueTrackMap: { [cuePath]: idx },
+                            cueCoverMap: { [cuePath]: song.cueCoverMap[cuePath] },
+                            cueAlbumMap: { [cuePath]: song.cueAlbumMap[cuePath] },
+                            cueArtistMap: { [cuePath]: song.cueArtistMap[cuePath] },
+                            cueTrackPerformerMap: { [cuePath]: song.cueTrackPerformerMap[cuePath] || '' },
+                            cueTrackTitleMap: { [cuePath]: song.cueTrackTitleMap[cuePath] || song.original_titles[0] },
+                            audioFile: song.audioFile,
+                            cueRef: cuePath,
+                            trackIndex: idx,
+                            cover: song.cueCoverMap[cuePath] || null,
+                            path: cuePath,
+                            _isSplit: true,
+                            _parentId: id,
+                        };
+                        result.push(subSong);
+                    }
+                    const splitCues = subIds.map(sid => sid.split('|')[1]);
+                    const remainingCues = song.cueFiles.filter(c => !splitCues.includes(c));
+                    if (remainingCues.length > 0) {
+                        const remainingSong = { ...song };
+                        remainingSong.cueFiles = remainingCues;
+                        remainingSong.cueTrackMap = {};
+                        remainingSong.cueCoverMap = {};
+                        remainingSong.cueAlbumMap = {};
+                        remainingSong.cueArtistMap = {};
+                        remainingSong.cueTrackPerformerMap = {};
+                        remainingSong.cueTrackTitleMap = {};
+                        remainingSong.performers = [];
+                        for (const c of remainingCues) {
+                            remainingSong.cueTrackMap[c] = song.cueTrackMap[c];
+                            remainingSong.cueCoverMap[c] = song.cueCoverMap[c];
+                            remainingSong.cueAlbumMap[c] = song.cueAlbumMap[c];
+                            remainingSong.cueArtistMap[c] = song.cueArtistMap[c];
+                            remainingSong.cueTrackPerformerMap[c] = song.cueTrackPerformerMap[c] || '';
+                            remainingSong.cueTrackTitleMap[c] = song.cueTrackTitleMap[c] || song.original_titles[0];
+                            const perf = song.cueTrackPerformerMap[c] || '';
+                            if (perf && !remainingSong.performers.includes(perf)) remainingSong.performers.push(perf);
+                        }
+                        remainingSong.cueRef = remainingCues[0];
+                        remainingSong.trackIndex = song.cueTrackMap[remainingCues[0]];
+                        remainingSong.cover = song.cueCoverMap[remainingCues[0]] || null;
+                        remainingSong.path = remainingCues[0];
+                        remainingSong._isSplit = false;
+                        remainingSong._parentId = undefined;
+                        result.push(remainingSong);
+                    }
+                } else {
+                    result.push({ ...song, _isSplit: false });
+                }
+            }
+            return result;
+        }
+
+        // ===== 拆分模态框 =====
+        function openSplitModal(parentId) {
+            const original = state.songs.find(s => s.id === parentId);
+            if (!original) {
+                alert('该条目已不存在，请刷新列表。');
+                return;
+            }
+            const allCues = original.cueFiles;
+            let splitCues = [];
+            if (state.splitMap[parentId]) {
+                splitCues = state.splitMap[parentId].map(sid => sid.split('|')[1]);
+            }
+            const availableCues = allCues.filter(c => !splitCues.includes(c));
+            if (availableCues.length === 0) {
+                alert('该条目所有来源均已拆分，无法再拆分。');
+                return;
+            }
+            state._pendingSplitParentId = parentId;
+            let listHtml = '';
+            availableCues.forEach(cue => {
+                const perf = original.cueTrackPerformerMap[cue] || '';
+                const title = original.cueTrackTitleMap[cue] || original.original_titles[0];
+                listHtml += `
+                    <li>
+                        <input type="checkbox" data-cue="${escapeHtml(cue)}" />
+                        <span class="cue-info">${escapeHtml(cue)}</span>
+                        <span class="perf-info">${perf ? '🎤 ' + escapeHtml(perf) : ''}</span>
+                        <span style="color:#94a3b8;font-size:12px;">${escapeHtml(title)}</span>
+                    </li>
+                `;
+            });
+            sourceList.innerHTML = listHtml;
+            splitModal.style.display = 'flex';
+        }
+
+        function confirmSplit() {
+            const parentId = state._pendingSplitParentId;
+            if (!parentId) return;
+            const original = state.songs.find(s => s.id === parentId);
+            if (!original) {
+                alert('父条目已不存在，请刷新列表。');
+                closeModal();
+                return;
+            }
+            const checkboxes = sourceList.querySelectorAll('input[type="checkbox"]:checked');
+            const selectedCues = Array.from(checkboxes).map(cb => cb.dataset.cue);
+            if (selectedCues.length === 0) {
+                alert('请至少选择一个来源进行拆分。');
+                return;
+            }
+            let existingSplitCues = [];
+            if (state.splitMap[parentId]) {
+                existingSplitCues = state.splitMap[parentId].map(sid => sid.split('|')[1]);
+            }
+            const newCues = selectedCues.filter(c => !existingSplitCues.includes(c));
+            if (newCues.length === 0) {
+                alert('所选来源均已拆分，无需重复操作。');
+                closeModal();
+                return;
+            }
+            const allSplitCues = [...existingSplitCues, ...newCues];
+            const subIds = allSplitCues.map(cue => `${parentId}|${cue}`);
+            state.splitMap[parentId] = subIds;
+            if (state.selected.has(parentId)) {
+                state.selected.delete(parentId);
+                for (const sid of subIds) {
+                    state.selected.add(sid);
+                }
+            }
+            state.playlist = [];
+            state.playIndex = -1;
+            if (currentAudio) { hidePlayer(); }
+            state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
+            saveState();
+            updateUI();
+            closeModal();
+        }
+
+        function mergeBack(subId) {
+            const subSong = state.displaySongs.find(s => s.id === subId);
+            if (!subSong || !subSong._parentId) {
+                alert('该条目已不存在或已合并，请刷新列表。');
+                return;
+            }
+            const parentId = subSong._parentId;
+            const parentExists = state.songs.some(s => s.id === parentId);
+            if (!parentExists) {
+                alert('父条目已不存在，无法合并。');
+                return;
+            }
+            if (state.splitMap[parentId]) {
+                state.splitMap[parentId] = state.splitMap[parentId].filter(id => id !== subId);
+                if (state.splitMap[parentId].length === 0) {
+                    delete state.splitMap[parentId];
+                }
+            } else {
+                alert('父条目已不存在，无法合并。');
+                return;
+            }
+            if (state.selected.has(subId)) {
+                state.selected.delete(subId);
+                const parentDisplay = state.displaySongs.some(s => s.id === parentId);
+                if (parentDisplay) {
+                    state.selected.add(parentId);
+                }
+            }
+            state.playlist = [];
+            state.playIndex = -1;
+            if (currentAudio) { hidePlayer(); }
+            state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
+            saveState();
+            updateUI();
+        }
+
+        function closeModal() {
+            splitModal.style.display = 'none';
+            state._pendingSplitParentId = null;
+        }
+
+        modalConfirmBtn.addEventListener('click', confirmSplit);
+        modalCancelBtn.addEventListener('click', closeModal);
+        modalCloseBtn.addEventListener('click', closeModal);
+        splitModal.addEventListener('click', (e) => {
+            if (e.target === splitModal) closeModal();
+        });
+
+        // ===== LocalStorage =====
+        const STORAGE_KEY = 'cue_tool_state';
+
+        function saveState() {
+            const data = {
+                dirs: state.dirs,
+                selected: Array.from(state.selected),
+                splitMap: state.splitMap,
+                version: 3,
+            };
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return null;
+                return JSON.parse(raw);
+            } catch (e) { return null; }
+        }
+
+        function restoreState() {
+            const saved = loadState();
+            if (!saved) return false;
+            state.dirs = saved.dirs || [];
+            state._pendingSelected = new Set(saved.selected || []);
+            state.splitMap = saved.splitMap || {};
+            renderDirs();
+            return true;
+        }
+
+        function restoreSelectedAfterScan() {
+            if (!state._pendingSelected) return;
+            const validIds = new Set(state.displaySongs.map(s => s.id));
+            for (const id of state._pendingSelected) {
+                if (validIds.has(id)) state.selected.add(id);
+            }
+            state._pendingSelected = null;
             updateUI();
             saveState();
-        });
-    });
-    songList.querySelectorAll('.song-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-            // 如果点击的是 INPUT、BUTTON 或 .cue-path 内部，不切换
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest('.cue-path')) return;
-            const cb = item.querySelector('.song-checkbox');
-            if (cb) { cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); }
-        });
-    });
+        }
 
-    countDisplay.innerHTML = `共 <strong>${state.displaySongs.length}</strong> 首`;
-    updateSelectedPanel();
-    updateHeaderCheckbox();
-    updateComputeBtn();
-}
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
 
-// ----- 其他辅助函数（未修改） -----
-function selectAllVisible() {
-    const search = state.searching.trim().toLowerCase();
-    let filtered = state.displaySongs;
-    if (search) {
-        filtered = state.displaySongs.filter(s => {
-            const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-            const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-            return origMatch || performerMatch;
-        });
-    }
-    for (const s of filtered) state.selected.add(s.id);
-    updateUI();
-    saveState();
-}
-function deselectAllVisible() {
-    const search = state.searching.trim().toLowerCase();
-    let filtered = state.displaySongs;
-    if (search) {
-        filtered = state.displaySongs.filter(s => {
-            const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-            const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-            return origMatch || performerMatch;
-        });
-    }
-    for (const s of filtered) state.selected.delete(s.id);
-    updateUI();
-    saveState();
-}
-function updateHeaderCheckbox() {
-    const search = state.searching.trim().toLowerCase();
-    let filtered = state.displaySongs;
-    if (search) {
-        filtered = state.displaySongs.filter(s => {
-            const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-            const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-            return origMatch || performerMatch;
-        });
-    }
-    const vis = filtered.length;
-    const checked = filtered.filter(s => state.selected.has(s.id)).length;
-    if (vis === 0) { headerCheckbox.checked = false; headerCheckbox.indeterminate = false; }
-    else if (checked === vis) { headerCheckbox.checked = true; headerCheckbox.indeterminate = false; }
-    else if (checked === 0) { headerCheckbox.checked = false; headerCheckbox.indeterminate = false; }
-    else { headerCheckbox.checked = false; headerCheckbox.indeterminate = true; }
-}
-function updateSelectedPanel() {
-    const selectedSongs = state.displaySongs.filter(s => state.selected.has(s.id));
-    selectedCount.textContent = selectedSongs.length;
-    if (selectedSongs.length === 0) {
-        selectedList.innerHTML = '<span style="color:#94a3b8;font-size:13px;">暂无选择</span>';
-    } else {
-        selectedList.innerHTML = selectedSongs.map(s => {
-            const main = (s.original_titles || [])[0] || s.id;
-            return `<span class="selected-item" data-id="${s.id}">
-                <span class="selected-text" style="cursor:pointer;text-decoration:underline;">${escapeHtml(main)}</span>
-                <span class="selected-remove" style="cursor:pointer;margin-left:6px;color:#ef4444;font-weight:bold;font-size:14px;">✕</span>
-            </span>`;
-        }).join('');
+        // ===== 目录管理 =====
+        function addDirectoryInternal(path) {
+            if (!path) return false;
+            if (state.dirs.includes(path)) {
+                scanStatus.textContent = `⚠️ 目录已存在: ${path}`;
+                scanStatus.style.color = '#f59e0b';
+                return false;
+            }
+            state.dirs.push(path);
+            renderDirs();
+            scanStatus.textContent = `已添加目录: ${path}`;
+            scanStatus.style.color = '#10b981';
+            saveState();
+            return true;
+        }
 
-        // 点击文本 → 滚动到歌曲列表对应条目
-        selectedList.querySelectorAll('.selected-text').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const item = el.closest('.selected-item');
-                const id = item.dataset.id;
-                const targetItem = findSongElementById(id);
+        function renderDirs() {
+            if (state.dirs.length === 0) {
+                dirList.innerHTML = '<span style="color:#94a3b8;font-size:13px;">还没有添加目录</span>';
+                return;
+            }
+            dirList.innerHTML = state.dirs.map((d, i) => `
+                <span class="dir-tag">
+                    ${escapeHtml(d)}
+                    <span class="del" data-index="${i}">✕</span>
+                </span>
+            `).join('');
+            dirList.querySelectorAll('.del').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    const idx = parseInt(e.target.dataset.index);
+                    state.dirs.splice(idx, 1);
+                    renderDirs();
+                    state.songs = [];
+                    state.displaySongs = [];
+                    state.selected.clear();
+                    state.splitMap = {};
+                    renderSongs();
+                    updateSelectedPanel();
+                    scanStatus.textContent = '目录已更新，请重新扫描';
+                    saveState();
+                    hidePlayer();
+                });
+            });
+        }
+
+        async function browseDirectory() {
+            scanStatus.textContent = '⏳ 正在打开文件夹选择窗口...';
+            scanStatus.style.color = '#475569';
+            try {
+                const resp = await fetch('/api/browse');
+                const data = await resp.json();
+                if (!data.success) {
+                    scanStatus.textContent = '❌ ' + (data.error || '选择失败');
+                    scanStatus.style.color = '#ef4444';
+                    return;
+                }
+                const path = data.path;
+                newDirInput.value = path;
+                const added = addDirectoryInternal(path);
+                if (added) newDirInput.value = '';
+                newDirInput.focus();
+                newDirInput.select();
+            } catch (err) {
+                scanStatus.textContent = '❌ 请求失败: ' + err.message;
+                scanStatus.style.color = '#ef4444';
+            }
+        }
+
+        function addDirectory() {
+            const path = newDirInput.value.trim();
+            if (!path) {
+                scanStatus.textContent = '⚠️ 请输入目录路径';
+                scanStatus.style.color = '#ef4444';
+                return;
+            }
+            if (addDirectoryInternal(path)) newDirInput.value = '';
+        }
+
+        // ===== 扫描 =====
+        async function scanAll() {
+            if (state.dirs.length === 0) {
+                scanStatus.textContent = '⚠️ 请先添加至少一个目录';
+                scanStatus.style.color = '#ef4444';
+                return;
+            }
+            scanStatus.textContent = '⏳ 正在扫描...';
+            scanStatus.style.color = '#475569';
+            scanAllBtn.disabled = true;
+            scanAllBtn.innerHTML = '<span class="spinner"></span> 扫描中';
+            try {
+                const resp = await fetch('/api/scan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ dirs: state.dirs })
+                });
+                const data = await resp.json();
+                if (!data.success) {
+                    scanStatus.textContent = '❌ ' + (data.error || '扫描失败');
+                    scanStatus.style.color = '#ef4444';
+                    return;
+                }
+                state.songs = data.songs || [];
+                state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
+                restoreSelectedAfterScan();
+                if (state.displaySongs.length === 0) {
+                    scanStatus.textContent = '⚠️ 未找到任何歌曲，请检查目录路径是否正确';
+                    scanStatus.style.color = '#f59e0b';
+                } else {
+                    const splitCount = Object.keys(state.splitMap).length;
+                    scanStatus.textContent =
+                        `✅ 扫描完成，共 ${state.displaySongs.length} 首歌曲（合并后 ${state.songs.length} 组，已拆分 ${splitCount} 组），来自 ${data.cueCount || 0} 个 CUE 文件`;
+                    scanStatus.style.color = '#10b981';
+                }
+                saveState();
+                updateUI();
+                state.playlist = [];
+                state.playIndex = -1;
+                hidePlayer();
+            } catch (err) {
+                scanStatus.textContent = '❌ 请求失败: ' + err.message;
+                scanStatus.style.color = '#ef4444';
+            } finally {
+                scanAllBtn.disabled = false;
+                scanAllBtn.innerHTML = '🔍 扫描全部';
+            }
+        }
+
+        // ===== 渲染歌曲列表 =====
+        function renderSongs() {
+            const search = state.searching.trim().toLowerCase();
+            let filtered = state.displaySongs;
+            if (search) {
+                filtered = state.displaySongs.filter(s => {
+                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
+                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
+                    return origMatch || performerMatch;
+                });
+            }
+            if (state.displaySongs.length === 0) {
+                songList.innerHTML = `<div class="empty-msg">📂 请添加目录并扫描</div>`;
+                countDisplay.innerHTML = '共 <strong>0</strong> 首';
+                headerCheckbox.checked = false;
+                return;
+            }
+            if (filtered.length === 0) {
+                songList.innerHTML =
+                    `<div class="empty-msg">🔍 没有匹配 "${escapeHtml(state.searching)}" 的歌曲</div>`;
+                countDisplay.innerHTML = `共 <strong>${state.displaySongs.length}</strong> 首`;
+                headerCheckbox.checked = false;
+                return;
+            }
+
+            let html = '';
+            for (const song of filtered) {
+                const checked = state.selected.has(song.id) ? 'checked' : '';
+                const sources = song.cueFiles || [song.path];
+                const originals = song.original_titles || [];
+                const mainTitle = originals.length > 0 ? originals[0] : song.id;
+                const altTitles = originals.slice(1).filter(t => t !== mainTitle);
+                const cueTrackMap = song.cueTrackMap || {};
+                const cueCoverMap = song.cueCoverMap || {};
+                const cueAlbumMap = song.cueAlbumMap || {};
+                const cueTrackPerformerMap = song.cueTrackPerformerMap || {};
+                const cueTrackTitleMap = song.cueTrackTitleMap || {};
+
+                const original = state.songs.find(s => s.id === song.id);
+                let isMerged = false;
+                if (original && !song._isSplit) {
+                    const remainingCues = song.cueFiles || [];
+                    if (remainingCues.length > 1) {
+                        isMerged = true;
+                    }
+                }
+                const isSplit = song._isSplit === true;
+
+                let sourcesHtml = '';
+                for (const cue of sources) {
+                    const idx = cueTrackMap[cue];
+                    const hasTrack = idx !== undefined;
+                    const coverForCue = cueCoverMap[cue] || '';
+                    const albumForCue = cueAlbumMap[cue] || '';
+                    const performerForCue = cueTrackPerformerMap[cue] || '';
+                    const rawTitle = cueTrackTitleMap[cue] || mainTitle;
+
+                    const playBtn = hasTrack ?
+                        `<button class="play-btn" data-cue="${escapeHtml(cue)}" data-index="${idx}" data-song-id="${escapeHtml(song.id)}" data-title="${escapeHtml(rawTitle)}" data-cover="${escapeHtml(coverForCue)}" data-album="${escapeHtml(albumForCue)}" data-artist="${escapeHtml(performerForCue)}" title="播放此来源的曲目片段">▶</button>` :
+                        '';
+
+                    const performerTag = performerForCue ?
+                        `<span class="performer-tag" title="${escapeHtml(performerForCue)}">🎤 ${escapeHtml(performerForCue)}</span>` :
+                        '';
+
+                    sourcesHtml += `<span class="cue-path" data-path="${escapeHtml(cue)}">
+                        <span class="cue-file">${escapeHtml(cue)}</span>
+                        ${performerTag}
+                        ${playBtn}
+                    </span>`;
+                }
+
+                const splitBtnHtml = (isMerged) ?
+                    `<button class="split-btn" data-id="${song.id}" title="拆分为独立版本（每个来源一首）">✂️</button>` :
+                    '';
+                const mergeBtnHtml = (isSplit) ?
+                    `<button class="merge-btn" data-id="${song.id}" title="合并回父条目">↺</button>` :
+                    '';
+
+                const splitLabel = isSplit ? ' [拆]' : '';
+
+                html += `
+                    <div class="song-item" data-id="${song.id}">
+                        <input type="checkbox" class="song-checkbox" data-id="${song.id}" ${checked} />
+                        <div class="info">
+                            <div class="title">${escapeHtml(mainTitle)}${splitLabel} ${splitBtnHtml} ${mergeBtnHtml}</div>
+                            ${altTitles.length > 0 ? `<div class="alt-titles">${altTitles.map(t => `<span class="alt">${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+                            <div class="sources">${sourcesHtml}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            songList.innerHTML = html;
+
+            // 事件绑定
+            songList.querySelectorAll('.play-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const cuePath = btn.dataset.cue;
+                    const index = parseInt(btn.dataset.index);
+                    const title = btn.dataset.title || '未知歌曲';
+                    const cover = btn.dataset.cover || '';
+                    const album = btn.dataset.album || '';
+                    const artist = btn.dataset.artist || '';
+                    const songId = btn.dataset.songId;
+                    if (!cuePath || isNaN(index)) {
+                        console.warn('缺少 cue 或 index');
+                        return;
+                    }
+                    playSong(cuePath, index, title, cover, album, artist, songId, true, true);
+                });
+            });
+            songList.querySelectorAll('.split-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    if (id) {
+                        openSplitModal(id);
+                    }
+                });
+            });
+            songList.querySelectorAll('.merge-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    if (id) {
+                        mergeBack(id);
+                    }
+                });
+            });
+            songList.querySelectorAll('.song-checkbox').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const id = e.target.dataset.id;
+                    if (e.target.checked) state.selected.add(id);
+                    else state.selected.delete(id);
+                    updateUI();
+                    saveState();
+                });
+            });
+            songList.querySelectorAll('.song-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest(
+                            '.cue-path')) return;
+                    const cb = item.querySelector('.song-checkbox');
+                    if (cb) { cb.checked = !cb.checked;
+                        cb.dispatchEvent(new Event('change')); }
+                });
+            });
+
+            countDisplay.innerHTML = `共 <strong>${state.displaySongs.length}</strong> 首`;
+            updateSelectedPanel();
+            updateHeaderCheckbox();
+            updateComputeBtn();
+        }
+
+        // ===== 其他辅助函数 =====
+        function selectAllVisible() {
+            const search = state.searching.trim().toLowerCase();
+            let filtered = state.displaySongs;
+            if (search) {
+                filtered = state.displaySongs.filter(s => {
+                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
+                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
+                    return origMatch || performerMatch;
+                });
+            }
+            for (const s of filtered) state.selected.add(s.id);
+            updateUI();
+            saveState();
+        }
+
+        function deselectAllVisible() {
+            const search = state.searching.trim().toLowerCase();
+            let filtered = state.displaySongs;
+            if (search) {
+                filtered = state.displaySongs.filter(s => {
+                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
+                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
+                    return origMatch || performerMatch;
+                });
+            }
+            for (const s of filtered) state.selected.delete(s.id);
+            updateUI();
+            saveState();
+        }
+
+        function updateHeaderCheckbox() {
+            const search = state.searching.trim().toLowerCase();
+            let filtered = state.displaySongs;
+            if (search) {
+                filtered = state.displaySongs.filter(s => {
+                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
+                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
+                    return origMatch || performerMatch;
+                });
+            }
+            const vis = filtered.length;
+            const checked = filtered.filter(s => state.selected.has(s.id)).length;
+            if (vis === 0) { headerCheckbox.checked = false;
+                headerCheckbox.indeterminate = false; } else if (checked === vis) { headerCheckbox.checked = true;
+                headerCheckbox.indeterminate = false; } else if (checked === 0) { headerCheckbox.checked = false;
+                headerCheckbox.indeterminate = false; } else { headerCheckbox.checked = false;
+                headerCheckbox.indeterminate = true; }
+        }
+
+        function updateSelectedPanel() {
+            const selectedSongs = state.displaySongs.filter(s => state.selected.has(s.id));
+            selectedCount.textContent = selectedSongs.length;
+            if (selectedSongs.length === 0) {
+                selectedList.innerHTML = '<span style="color:#94a3b8;font-size:13px;">暂无选择</span>';
+            } else {
+                selectedList.innerHTML = selectedSongs.map(s => {
+                    const main = (s.original_titles || [])[0] || s.id;
+                    return `<span class="selected-item" data-id="${s.id}">
+                        <span class="selected-text" style="cursor:pointer;text-decoration:underline;">${escapeHtml(main)}</span>
+                        <span class="selected-remove" style="cursor:pointer;margin-left:6px;color:#ef4444;font-weight:bold;font-size:14px;">✕</span>
+                    </span>`;
+                }).join('');
+
+                selectedList.querySelectorAll('.selected-text').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const item = el.closest('.selected-item');
+                        const id = item.dataset.id;
+                        const targetItem = findSongElementById(id);
+                        if (targetItem) {
+                            targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            targetItem.style.transition = 'background 0.3s';
+                            targetItem.style.background = '#fef3c7';
+                            setTimeout(() => {
+                                targetItem.style.background = '';
+                            }, 1500);
+                        } else {
+                            console.warn('未找到歌曲元素:', id);
+                            // 不再alert，仅控制台提示
+                        }
+                    });
+                });
+
+                selectedList.querySelectorAll('.selected-remove').forEach(el => {
+                    el.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const item = el.closest('.selected-item');
+                        const id = item.dataset.id;
+                        state.selected.delete(id);
+                        updateUI();
+                        saveState();
+                    });
+                });
+            }
+            updateComputeBtn();
+        }
+
+        function updateComputeBtn() {
+            const count = state.selected.size;
+            computeBtn.disabled = (count === 0 || state.displaySongs.length === 0);
+            hintText.textContent = count === 0 ? '请勾选歌曲' : `已选 ${count} 首，点击计算`;
+        }
+
+        function updateUI() {
+            renderSongs();
+            updateSelectedPanel();
+            updateHeaderCheckbox();
+            updateComputeBtn();
+            state.results = null;
+            resultArea.classList.remove('visible');
+        }
+
+        // ===== 计算 =====
+        async function computeBest() {
+            if (state.selected.size === 0) return;
+            computeBtn.disabled = true;
+            computeBtn.innerHTML = '<span class="spinner"></span> 计算中';
+
+            const K = parseInt(document.getElementById('KInput').value) || 20;
+            const w_c = parseFloat(document.getElementById('w_c_input').value) || 10;
+            const w_m = parseFloat(document.getElementById('w_m_input').value) || 5;
+            const w_e = parseFloat(document.getElementById('w_e_input').value) || 1;
+
+            try {
+                const resp = await fetch('/api/compute', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        songs: state.displaySongs,
+                        selected: Array.from(state.selected),
+                        K: K,
+                        w_c: w_c,
+                        w_m: w_m,
+                        w_e: w_e
+                    })
+                });
+                const data = await resp.json();
+                if (!data.success) {
+                    alert('计算失败: ' + (data.error || '未知错误'));
+                    return;
+                }
+                state.results = data.schemes;
+                renderResults(data.schemes, data.totalSelected);
+            } catch (err) {
+                alert('请求失败: ' + err.message);
+            } finally {
+                computeBtn.disabled = false;
+                computeBtn.innerHTML = '🧮 计算最佳组合';
+            }
+        }
+
+        // ===== 查找歌曲DOM元素（增强版）=====
+        function findSongElementById(id) {
+            let target = document.querySelector(`.song-item[data-id="${id}"]`);
+            if (target) return target;
+            const displaySong = state.displaySongs.find(s => s.id === id);
+            if (displaySong && displaySong._parentId) {
+                const parentId = displaySong._parentId;
+                const parentDisplay = state.displaySongs.find(s => s.id === parentId);
+                if (parentDisplay) {
+                    target = document.querySelector(`.song-item[data-id="${parentId}"]`);
+                    if (target) return target;
+                }
+                const siblings = state.displaySongs.filter(s => s._parentId === parentId && s.id !== id);
+                if (siblings.length > 0) {
+                    target = document.querySelector(`.song-item[data-id="${siblings[0].id}"]`);
+                    if (target) return target;
+                }
+            }
+            const original = state.songs.find(s => s.id === id);
+            if (original) {
+                const children = state.displaySongs.filter(s => s._parentId === id);
+                if (children.length > 0) {
+                    target = document.querySelector(`.song-item[data-id="${children[0].id}"]`);
+                    if (target) return target;
+                }
+            }
+            return null;
+        }
+
+        // ===== 渲染结果 =====
+        function renderResults(schemes, totalSelected) {
+            resultArea.classList.add('visible');
+            resultBadge.textContent = `${schemes.length} 个方案`;
+            if (schemes.length === 0) {
+                resultContent.innerHTML = '<p style="color:#94a3b8;">没有找到任何覆盖方案，请检查是否选中有歌曲未被任何 CUE 包含。</p>';
+                return;
+            }
+            let html = '';
+            schemes.forEach((scheme, idx) => {
+                const isBest = idx === 0;
+                const coveredCount = scheme.covered.length;
+                const missCount = scheme.miss.length;
+                const extraCount = scheme.extra_count || 0;
+                const total = totalSelected;
+                const percent = total > 0 ? Math.round((coveredCount / total) * 100) : 0;
+
+                let missHtml = '';
+                if (missCount > 0) {
+                    missHtml = `<div style="margin-top:6px;"><span class="miss-song-label">缺失歌曲：</span> ${scheme.miss.map(id => {
+                        const displaySong = state.displaySongs.find(s => s.id === id);
+                        const originalSong = state.songs.find(s => s.id === id);
+                        const song = displaySong || originalSong;
+                        const title = song && song.original_titles ? song.original_titles[0] : id;
+                        return `<span class="miss-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#ca8a04;">${escapeHtml(title)}</span>`;
+                    }).join('、')}</div>`;
+                }
+
+                let extraHtml = '';
+                if (extraCount > 0 && scheme.extra && scheme.extra.length > 0) {
+                    const extraMap = {};
+                    scheme.extra.forEach(id => { extraMap[id] = (extraMap[id] || 0) + 1; });
+                    const extraDisplay = Object.keys(extraMap).map(id => {
+                        const displaySong = state.displaySongs.find(s => s.id === id);
+                        const originalSong = state.songs.find(s => s.id === id);
+                        const song = displaySong || originalSong;
+                        const title = song && song.original_titles ? song.original_titles[0] : id;
+                        const count = extraMap[id];
+                        return `<span class="extra-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#dc2626;">${escapeHtml(title)}${count > 1 ? ` (×${count})` : ''}</span>`;
+                    });
+                    extraHtml = `<div style="margin-top:6px;"><span class="extra-song-label">额外歌曲（重复）：</span> ${extraDisplay.join('、')}</div>`;
+                }
+
+                html += `
+                    <div class="scheme-card">
+                        <div class="scheme-header">
+                            <strong>方案 ${idx + 1}</strong>
+                            ${isBest ? '<span class="tag-best">⭐ 推荐</span>' : ''}
+                            <span class="extra-info">
+                                <span class="${missCount === 0 ? 'good' : 'bad'}">✅ 覆盖 ${coveredCount}/${total} (${percent}%)</span>
+                                ${missCount > 0 ? `<span class="bad">❌ 缺失 ${missCount} 首</span>` : ''}
+                                ${extraCount > 0 ? `<span class="neutral">➕ 额外 ${extraCount} 首</span>` : ''}
+                                <span>📁 ${scheme.cueFiles.length} 个 CUE</span>
+                            </span>
+                        </div>
+                        <div style="margin-top:8px;font-size:13px;">
+                            <div><strong>使用的 CUE 文件：</strong></div>
+                            <ul class="cue-list">
+                                ${scheme.cueFiles.map(c => `<li><span class="cue-path" data-path="${escapeHtml(c.path)}" style="cursor:pointer;text-decoration:underline;color:#3b82f6;">${escapeHtml(c.path)}</span> (${c.songs.length} 首)</li>`).join('')}
+                            </ul>
+                            ${missHtml}
+                            ${extraHtml}
+                        </div>
+                    </div>
+                `;
+            });
+            resultContent.innerHTML = html;
+
+            // CUE路径点击打开文件
+            resultContent.querySelectorAll('.cue-path').forEach(el => {
+                el.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const path = this.dataset.path;
+                    if (!path) return;
+                    fetch('/api/open_file', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ path: path })
+                    }).then(res => res.json()).then(data => {
+                        if (!data.success) alert('打开失败: ' + (data.error || '未知错误'));
+                    }).catch(err => alert('请求失败: ' + err.message));
+                });
+            });
+
+            // 缺失/额外歌曲点击滚动（无alert）
+            const scrollHandler = function(e) {
+                const songId = this.dataset.songId;
+                if (!songId) return;
+                const targetItem = findSongElementById(songId);
                 if (targetItem) {
                     targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     targetItem.style.transition = 'background 0.3s';
                     targetItem.style.background = '#fef3c7';
-                    setTimeout(() => {
-                        targetItem.style.background = '';
-                    }, 1500);
+                    setTimeout(() => { targetItem.style.background = ''; }, 1500);
                 } else {
-                    alert('未找到该歌曲，可能已被移除或拆分后不再显示。');
+                    console.warn('未找到歌曲元素:', songId);
                 }
+            };
+
+            resultContent.querySelectorAll('.miss-song, .extra-song').forEach(el => {
+                el.addEventListener('click', scrollHandler);
+            });
+        }
+
+        // ===== 播放器标题点击滚动 =====
+        document.getElementById('playerTitle').addEventListener('click', function() {
+            if (!currentSongId) {
+                playerStatus.textContent = '当前无播放歌曲';
+                setTimeout(() => { if (currentAudio) playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中'; }, 2000);
+                return;
+            }
+            const targetItem = findSongElementById(currentSongId);
+            if (targetItem) {
+                targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                targetItem.style.transition = 'background 0.3s';
+                targetItem.style.background = '#fef3c7';
+                setTimeout(() => { targetItem.style.background = ''; }, 1500);
+            } else {
+                playerStatus.textContent = '歌曲未在列表中';
+                console.warn('未找到歌曲元素:', currentSongId);
+                setTimeout(() => { if (currentAudio) playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中'; }, 2000);
+            }
+        });
+
+        // ===== 事件绑定（全局）=====
+        addDirBtn.addEventListener('click', addDirectory);
+        newDirInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addDirectory(); });
+        browseDirBtn.addEventListener('click', browseDirectory);
+        scanAllBtn.addEventListener('click', scanAll);
+        searchInput.addEventListener('input', (e) => {
+            state.searching = e.target.value;
+            renderSongs();
+            updateHeaderCheckbox();
+        });
+        headerCheckbox.addEventListener('change', (e) => {
+            const checked = e.target.checked;
+            const search = state.searching.trim().toLowerCase();
+            let filtered = state.displaySongs;
+            if (search) {
+                filtered = state.displaySongs.filter(s => {
+                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
+                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
+                    return origMatch || performerMatch;
+                });
+            }
+            for (const s of filtered) {
+                if (checked) state.selected.add(s.id);
+                else state.selected.delete(s.id);
+            }
+            updateUI();
+            saveState();
+        });
+        selectAllBtn.addEventListener('click', selectAllVisible);
+        deselectAllBtn.addEventListener('click', deselectAllVisible);
+        computeBtn.addEventListener('click', computeBest);
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
+                const active = document.activeElement;
+                if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
+                e.preventDefault();
+                selectAllVisible();
+            }
+        });
+
+        // Ctrl+点击cue-path打开文件
+        document.getElementById('songList').addEventListener('click', function(e) {
+            const cuePathEl = e.target.closest('.cue-path');
+            if (!cuePathEl) return;
+            if (e.target.closest('.play-btn')) return;
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                const path = cuePathEl.dataset.path;
+                if (!path) return;
+                fetch('/api/open_file', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: path })
+                }).then(res => res.json()).then(data => {
+                    if (!data.success) alert('打开失败: ' + (data.error || '未知错误'));
+                }).catch(err => alert('请求失败: ' + err.message));
+            }
+        });
+
+        // Ctrl键样式
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+                document.querySelectorAll('.cue-path').forEach(el => {
+                    el.classList.add('ctrl-hover');
+                });
+            }
+        });
+        document.addEventListener('keyup', function(e) {
+            if (!e.ctrlKey && !e.metaKey) {
+                document.querySelectorAll('.cue-path').forEach(el => {
+                    el.classList.remove('ctrl-hover');
+                });
+            }
+        });
+        window.addEventListener('blur', function() {
+            document.querySelectorAll('.cue-path').forEach(el => {
+                el.classList.remove('ctrl-hover');
             });
         });
 
-        // 点击 ✕ → 取消选中
-        selectedList.querySelectorAll('.selected-remove').forEach(el => {
-            el.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const item = el.closest('.selected-item');
-                const id = item.dataset.id;
-                state.selected.delete(id);
-                updateUI();
-                saveState();
-            });
-        });
-    }
-    updateComputeBtn();
-}
-function updateComputeBtn() {
-    const count = state.selected.size;
-    computeBtn.disabled = (count === 0 || state.displaySongs.length === 0);
-    hintText.textContent = count === 0 ? '请勾选歌曲' : `已选 ${count} 首，点击计算`;
-}
-function updateUI() {
-    renderSongs();
-    updateSelectedPanel();
-    updateHeaderCheckbox();
-    updateComputeBtn();
-    state.results = null;
-    resultArea.classList.remove('visible');
-}
-
-// ----- 计算（仅保留一个，带权重参数） -----
-async function computeBest() {
-    if (state.selected.size === 0) return;
-    computeBtn.disabled = true;
-    computeBtn.innerHTML = '<span class="spinner"></span> 计算中';
-
-    const K = parseInt(document.getElementById('KInput').value) || 20;
-    const w_c = parseFloat(document.getElementById('w_c_input').value) || 10;
-    const w_m = parseFloat(document.getElementById('w_m_input').value) || 5;
-    const w_e = parseFloat(document.getElementById('w_e_input').value) || 1;
-
-    try {
-        const resp = await fetch('/api/compute', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                songs: state.displaySongs,
-                selected: Array.from(state.selected),
-                K: K,
-                w_c: w_c,
-                w_m: w_m,
-                w_e: w_e
-            })
-        });
-        const data = await resp.json();
-        if (!data.success) {
-            alert('计算失败: ' + (data.error || '未知错误'));
-            return;
+        // ===== 初始化 =====
+        function init() {
+            const hasSaved = restoreState();
+            if (hasSaved) {
+                renderDirs();
+                renderSongs();
+                updateSelectedPanel();
+                updateComputeBtn();
+            } else {
+                renderDirs();
+                renderSongs();
+                updateSelectedPanel();
+                updateComputeBtn();
+            }
+            if (hasSaved && state.dirs.length > 0) {
+                setTimeout(() => scanAll(), 300);
+            } else {
+                state._pendingSelected = null;
+            }
+            state.initialized = true;
+            console.log('🎵 工具已初始化，循环上一首和智能随机已启用。');
         }
-        state.results = data.schemes;
-        renderResults(data.schemes, data.totalSelected);
-    } catch (err) {
-        alert('请求失败: ' + err.message);
-    } finally {
-        computeBtn.disabled = false;
-        computeBtn.innerHTML = '🧮 计算最佳组合';
-    }
-}
-
-/**
- * 根据歌曲 ID 查找对应的 DOM 元素，支持已拆分的子条目回退到父条目
- * 优先精确匹配，若找不到则尝试查找父 ID 对应的子条目（首个）
- */
-function findSongElementById(id) {
-    // 先尝试精确匹配
-    let target = document.querySelector(`.song-item[data-id="${id}"]`);
-    if (target) return target;
-
-    // 如果精确匹配失败，可能是父 ID（原合并条目已完全拆分）
-    // 在 state.songs 中查找原始条目
-    const original = state.songs.find(s => s.id === id);
-    if (original) {
-        // 查找 displaySongs 中 _parentId 等于该 id 的子条目
-        const children = state.displaySongs.filter(s => s._parentId === id);
-        if (children.length > 0) {
-            // 返回第一个子条目的 DOM 元素
-            return document.querySelector(`.song-item[data-id="${children[0].id}"]`);
-        }
-    }
-    return null;
-}
-
-// ===== renderResults（补全） =====
-function renderResults(schemes, totalSelected) {
-    resultArea.classList.add('visible');
-    resultBadge.textContent = `${schemes.length} 个方案`;
-    if (schemes.length === 0) {
-        resultContent.innerHTML = '<p style="color:#94a3b8;">没有找到任何覆盖方案，请检查是否选中有歌曲未被任何 CUE 包含。</p>';
-        return;
-    }
-    let html = '';
-    schemes.forEach((scheme, idx) => {
-        const isBest = idx === 0;
-        const coveredCount = scheme.covered.length;
-        const missCount = scheme.miss.length;
-        const extraCount = scheme.extra_count || 0;
-        const total = totalSelected;
-        const percent = total > 0 ? Math.round((coveredCount / total) * 100) : 0;
-
-        // 构建缺失歌曲列表
-        let missHtml = '';
-        if (missCount > 0) {
-            missHtml = `<div style="margin-top:6px;"><span class="miss-song-label">缺失歌曲：</span> ${scheme.miss.map(id => {
-                // 先在 displaySongs 中查找（支持拆分子条目），若找不到则回退到 songs
-                const displaySong = state.displaySongs.find(s => s.id === id);
-                const originalSong = state.songs.find(s => s.id === id);
-                const song = displaySong || originalSong;
-                const title = song && song.original_titles ? song.original_titles[0] : id;
-                return `<span class="miss-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#ca8a04;">${escapeHtml(title)}</span>`;
-            }).join('、')}</div>`;
-        }
-
-        // 构建额外歌曲列表（只显示重复出现的歌曲标题，去重显示但保留重复次数）
-        let extraHtml = '';
-        if (extraCount > 0 && scheme.extra && scheme.extra.length > 0) {
-            // 去重但保留重复次数（显示在括号里）
-            const extraMap = {};
-            scheme.extra.forEach(id => {
-                extraMap[id] = (extraMap[id] || 0) + 1;
-            });
-            const extraDisplay = Object.keys(extraMap).map(id => {
-                const displaySong = state.displaySongs.find(s => s.id === id);
-                const originalSong = state.songs.find(s => s.id === id);
-                const song = displaySong || originalSong;
-                const title = song && song.original_titles ? song.original_titles[0] : id;
-                const count = extraMap[id];
-                return `<span class="extra-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#dc2626;">${escapeHtml(title)}${count > 1 ? ` (×${count})` : ''}</span>`;
-            });
-            extraHtml = `<div style="margin-top:6px;"><span class="extra-song-label">额外歌曲（重复）：</span> ${extraDisplay.join('、')}</div>`;
-        }
-
-        html += `
-            <div class="scheme-card">
-                <div class="scheme-header">
-                    <strong>方案 ${idx + 1}</strong>
-                    ${isBest ? '<span class="tag-best">⭐ 推荐</span>' : ''}
-                    <span class="extra-info">
-                        <span class="${missCount === 0 ? 'good' : 'bad'}">✅ 覆盖 ${coveredCount}/${total} (${percent}%)</span>
-                        ${missCount > 0 ? `<span class="bad">❌ 缺失 ${missCount} 首</span>` : ''}
-                        ${extraCount > 0 ? `<span class="neutral">➕ 额外 ${extraCount} 首</span>` : ''}
-                        <span>📁 ${scheme.cueFiles.length} 个 CUE</span>
-                    </span>
-                </div>
-                <div style="margin-top:8px;font-size:13px;">
-                    <div><strong>使用的 CUE 文件：</strong></div>
-                    <ul class="cue-list">
-                        ${scheme.cueFiles.map(c => `<li><span class="cue-path" data-path="${escapeHtml(c.path)}" style="cursor:pointer;text-decoration:underline;color:#3b82f6;">${escapeHtml(c.path)}</span> (${c.songs.length} 首)</li>`).join('')}
-                    </ul>
-                    ${missHtml}
-                    ${extraHtml}
-                </div>
-            </div>
-        `;
-    });
-    resultContent.innerHTML = html;
-
-    // ----- 事件绑定：CUE 路径点击打开文件管理器 -----
-    resultContent.querySelectorAll('.cue-path').forEach(el => {
-        el.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const path = this.dataset.path;
-            if (!path) return;
-            fetch('/api/open_file', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ path: path })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.success) alert('打开失败: ' + (data.error || '未知错误'));
-            })
-            .catch(err => alert('请求失败: ' + err.message));
-        });
-    });
-
-    // ----- 事件绑定：缺失/额外歌曲点击滚动到对应条目 -----
-    const scrollHandler = function(e) {
-        const songId = this.dataset.songId;
-        if (!songId) return;
-        const targetItem = findSongElementById(songId);
-        if (targetItem) {
-            targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            targetItem.style.transition = 'background 0.3s';
-            targetItem.style.background = '#fef3c7';
-            setTimeout(() => {
-                targetItem.style.background = '';
-            }, 1500);
-        } else {
-            alert('未找到该歌曲，可能已被移除或拆分后不再显示。');
-        }
-    };
-
-    resultContent.querySelectorAll('.miss-song, .extra-song').forEach(el => {
-        el.addEventListener('click', scrollHandler);
-    });
-}
-
-// ----- 事件绑定（原有） -----
-addDirBtn.addEventListener('click', addDirectory);
-newDirInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addDirectory(); });
-browseDirBtn.addEventListener('click', browseDirectory);
-scanAllBtn.addEventListener('click', scanAll);
-searchInput.addEventListener('input', (e) => {
-    state.searching = e.target.value;
-    renderSongs();
-    updateHeaderCheckbox();
-});
-headerCheckbox.addEventListener('change', (e) => {
-    const checked = e.target.checked;
-    const search = state.searching.trim().toLowerCase();
-    let filtered = state.displaySongs;
-    if (search) {
-        filtered = state.displaySongs.filter(s => {
-            const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-            const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-            return origMatch || performerMatch;
-        });
-    }
-    for (const s of filtered) {
-        if (checked) state.selected.add(s.id);
-        else state.selected.delete(s.id);
-    }
-    updateUI();
-    saveState();
-});
-selectAllBtn.addEventListener('click', selectAllVisible);
-deselectAllBtn.addEventListener('click', deselectAllVisible);
-computeBtn.addEventListener('click', computeBest);
-document.addEventListener('keydown', (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
-        const active = document.activeElement;
-        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
-        e.preventDefault();
-        selectAllVisible();
-    }
-});
-
-// ----- 控制栏歌曲名点击滚动到对应歌曲 -----
-document.getElementById('playerTitle').addEventListener('click', function() {
-    if (!currentSongId) {
-        alert('当前没有播放的歌曲');
-        return;
-    }
-    const targetItem = findSongElementById(currentSongId);
-    if (targetItem) {
-        targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        targetItem.style.transition = 'background 0.3s';
-        targetItem.style.background = '#fef3c7';
-        setTimeout(() => {
-            targetItem.style.background = '';
-        }, 1500);
-    } else {
-        alert('未找到该歌曲，可能已被移除或拆分后不再显示。');
-    }
-});
-
-// ----- 歌曲列表中 Ctrl+点击 cue-path 打开文件管理器 -----
-document.getElementById('songList').addEventListener('click', function(e) {
-    const cuePathEl = e.target.closest('.cue-path');
-    if (!cuePathEl) return;
-    if (e.target.closest('.play-btn')) return;
-    if (e.ctrlKey || e.metaKey) {
-        e.preventDefault();
-        const path = cuePathEl.dataset.path;
-        if (!path) return;
-        fetch('/api/open_file', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: path })
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) alert('打开失败: ' + (data.error || '未知错误'));
-        })
-        .catch(err => alert('请求失败: ' + err.message));
-    }
-});
-
-// ----- 控制 Ctrl 键按下/松开时，修改 .cue-path 的样式 -----
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey || e.metaKey) {
-        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-        document.querySelectorAll('.cue-path').forEach(el => {
-            el.classList.add('ctrl-hover');
-        });
-    }
-});
-document.addEventListener('keyup', function(e) {
-    if (!e.ctrlKey && !e.metaKey) {
-        document.querySelectorAll('.cue-path').forEach(el => {
-            el.classList.remove('ctrl-hover');
-        });
-    }
-});
-window.addEventListener('blur', function() {
-    document.querySelectorAll('.cue-path').forEach(el => {
-        el.classList.remove('ctrl-hover');
-    });
-});
-
-// ----- 初始化 -----
-function init() {
-    const hasSaved = restoreState();
-    if (hasSaved) {
-        renderDirs();
-        renderSongs();
-        updateSelectedPanel();
-        updateComputeBtn();
-    } else {
-        renderDirs();
-        renderSongs();
-        updateSelectedPanel();
-        updateComputeBtn();
-    }
-    if (hasSaved && state.dirs.length > 0) {
-        setTimeout(() => scanAll(), 300);
-    } else {
-        state._pendingSelected = null;
-    }
-    state.initialized = true;
-    console.log('🎵 工具已初始化，若存在保存状态将自动恢复。');
-}
-init();
-</script>
+        init();
+    </script>
 </body>
 </html>
