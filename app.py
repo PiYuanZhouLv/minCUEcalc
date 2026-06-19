@@ -573,17 +573,21 @@ def export_selected_songs(songs, target_dir, format, template, duplicate_mode):
                 yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': raw_title, 'status': 'skipped', 'msg': '文件已存在，已跳过'}
                 continue
 
-            # 构建 ffmpeg 命令
+            # ---------- 构建 ffmpeg 命令 ----------
             cmd = ['ffmpeg', '-ss', str(start), '-to', str(end), '-i', audio_file]
-            if cover and os.path.exists(cover):
+
+            # 判断是否支持内嵌封面（作为视频流）—— OGG/Opus/WAV 不支持
+            cover_supported = ext not in ['ogg', 'opus', 'wav']
+            if cover and os.path.exists(cover) and cover_supported:
                 cmd.extend(['-i', cover])
                 cmd.extend(['-map', '0:a', '-map', '1'])
                 cmd.extend(['-c:v', 'copy'])
-                cmd.extend(['-id3v2_version', '3'])
-                cmd.extend(['-metadata:s:v', 'title="Album cover"'])
-                cmd.extend(['-metadata:s:v', 'comment="Cover (front)"'])
+                cmd.extend(['-disposition:v:0', 'attached_pic'])
             else:
                 cmd.extend(['-map', '0:a'])
+
+            # 清除所有输入元数据，避免复制 CUE 表等无关信息
+            cmd.extend(['-map_metadata', '-1'])
 
             # 音频编码
             cmd.extend(['-acodec', fmt_info['codec']])
@@ -592,7 +596,11 @@ def export_selected_songs(songs, target_dir, format, template, duplicate_mode):
             if fmt_info['extra_args']:
                 cmd.extend(fmt_info['extra_args'])
 
-            # 元数据
+            # 如果是 MP3，添加 ID3v2 版本支持（有利于封面显示）
+            if fmt_info['codec'] == 'libmp3lame':
+                cmd.extend(['-id3v2_version', '3'])
+
+            # 手动设置元数据
             if raw_title:
                 cmd.extend(['-metadata', f'title={raw_title}'])
             if artist:

@@ -2008,32 +2008,40 @@
             }
         });
 
+        function setExportFormEnabled(enabled) {
+            const controls = [exportDirInput, exportFormat, exportTemplate, exportDuplicate, exportBrowseBtn];
+            controls.forEach(el => el.disabled = !enabled);
+        }
+
         // ===== 导出功能 =====
         function openExportModal() {
             if (state.selected.size === 0) {
                 showToast('请先选择要导出的歌曲', 'warning');
                 return;
             }
-            exportDirInput.value = ''; // 清空，让用户填写或浏览
+            // 启用所有表单控件
+            setExportFormEnabled(true);
+            exportDirInput.value = '';
             exportTemplate.value = '{title} - {artist}';
             exportProgressArea.style.display = 'none';
             exportProgress.value = 0;
             exportLog.innerHTML = '';
-            exportStartBtn.disabled = false;
             exportStartBtn.textContent = '🚀 开始导出';
+            exportStartBtn.disabled = false;
+            exportStartBtn.onclick = startExport;
             exportModal.style.display = 'flex';
         }
 
         function closeExportModal() {
             exportModal.style.display = 'none';
-            // 重置按钮为初始状态
+            setExportFormEnabled(true);
             exportStartBtn.textContent = '🚀 开始导出';
             exportStartBtn.disabled = false;
             exportStartBtn.onclick = startExport;
-            // 隐藏进度区
             exportProgressArea.style.display = 'none';
             exportProgress.value = 0;
             exportLog.innerHTML = '';
+            detachFormChangeListener();
         }
 
         async function browseExportDir() {
@@ -2051,14 +2059,13 @@
         }
 
         async function startExport() {
-            exportStartBtn.onclick = null; // 避免导出过程中再次触发
             const targetDir = exportDirInput.value.trim();
             if (!targetDir) {
                 showToast('请指定保存目录', 'error');
                 return;
             }
             const format = exportFormat.value;
-            const template = exportTemplate.value.trim() || '{title} - {artist}.{ext}';
+            const template = exportTemplate.value.trim() || '{title} - {artist}';
             const duplicate = exportDuplicate.value;
 
             // 获取选中的歌曲列表
@@ -2089,9 +2096,12 @@
             }));
 
             // 显示进度区域
+            exportStartBtn.onclick = null; // 避免导出过程中再次触发
+            detachFormChangeListener();
             exportProgressArea.style.display = 'block';
             exportProgress.value = 0;
             exportLog.innerHTML = '准备导出...';
+            setExportFormEnabled(false);
             exportStartBtn.disabled = true;
             exportStartBtn.textContent = '导出中...';
 
@@ -2186,12 +2196,14 @@
                 
                 exportStartBtn.textContent = '✅ 完成';
                 exportStartBtn.disabled = false;
-                // 点击按钮关闭模态框，并恢复为初始状态
+                // 点击按钮关闭模态框
                 exportStartBtn.onclick = function() {
                     closeExportModal();
-                    // 还原按钮功能（因为 closeExportModal 已重置，但这里确保回调正确）
-                    exportStartBtn.onclick = startExport;
                 };
+                // 启用表单（允许修改）
+                setExportFormEnabled(true);
+                // 添加监听器，一旦表单改变则重置按钮
+                attachFormChangeListener();
             } else {
                 console.warn('未知事件类型:', type);
             }
@@ -2203,6 +2215,37 @@
             p.textContent = text;
             log.appendChild(p);
             log.scrollTop = log.scrollHeight;
+        }
+
+        let formChangeListenerAttached = false;
+
+        function attachFormChangeListener() {
+            if (formChangeListenerAttached) return;
+            const controls = [exportDirInput, exportFormat, exportTemplate, exportDuplicate];
+            controls.forEach(el => {
+                el.addEventListener('input', onFormChange);
+                el.addEventListener('change', onFormChange);
+            });
+            formChangeListenerAttached = true;
+        }
+
+        function onFormChange() {
+            // 只有当按钮显示为“完成”时才重置
+            if (exportStartBtn.textContent === '✅ 完成') {
+                exportStartBtn.textContent = '🚀 开始导出';
+                exportStartBtn.onclick = startExport;
+                // 移除监听，避免重复触发
+                detachFormChangeListener();
+            }
+        }
+
+        function detachFormChangeListener() {
+            const controls = [exportDirInput, exportFormat, exportTemplate, exportDuplicate];
+            controls.forEach(el => {
+                el.removeEventListener('input', onFormChange);
+                el.removeEventListener('change', onFormChange);
+            });
+            formChangeListenerAttached = false;
         }
 
         // ===== 事件绑定（全局）=====
@@ -2294,7 +2337,6 @@
             if (e.target === exportModal) closeExportModal();
         });
         exportBrowseBtn.addEventListener('click', browseExportDir);
-        exportStartBtn.onclick = startExport;
 
         // ===== 导出/导入状态 =====
         document.getElementById('exportStateBtn').addEventListener('click', exportState);
