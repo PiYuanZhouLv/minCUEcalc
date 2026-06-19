@@ -123,6 +123,54 @@
         #splitModal .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
         .song-item .sources .cue-path.ctrl-hover { cursor: alias; background: rgba(59, 130, 246, 0.08); border-radius: 4px; }
+
+        /* Toast 样式 */
+        .toast {
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            opacity: 0;
+            transform: translateX(30px);
+            transition: opacity 0.3s, transform 0.3s;
+            pointer-events: auto;
+            cursor: default;
+            backdrop-filter: blur(4px);
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        .toast-success { background: rgba(16, 185, 129, 0.9); }
+        .toast-error { background: rgba(239, 68, 68, 0.9); }
+        .toast-warning { background: rgba(245, 158, 11, 0.9); }
+        .toast-info { background: rgba(59, 130, 246, 0.9); }
+        .toast .toast-close {
+            float: right;
+            margin-left: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+        }
+        .toast .toast-close:hover { opacity: 1; }
+
+        .song-item .sources .cue-path .download-btn {
+            flex: 0 0 auto;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #10b981;
+            font-size: 14px;
+            padding: 0 2px;
+            line-height: 1;
+        }
+        .song-item .sources .cue-path .download-btn:hover {
+            color: #059669;
+        }
+        #playerDownloadBtn {
+            font-size: 20px; /* 与播放器其他按钮一致 */
+        }
     </style>
 </head>
 <body>
@@ -213,6 +261,7 @@
                 <span class="player-time" id="playerDuration">0:00</span>
             </div>
             <span class="player-status" id="playerStatus">就绪</span>
+            <button class="player-btn" id="playerDownloadBtn" title="下载当前歌曲">⬇</button>
         </div>
     </div>
 
@@ -241,6 +290,9 @@
             </div>
         </div>
     </div>
+
+    <!-- Toast 容器 -->
+    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; max-width:360px; width:100%; pointer-events:none;"></div>
 
     <script>
         // ========================== 完整前端逻辑 ==========================
@@ -322,6 +374,87 @@
             const m = Math.floor(seconds / 60);
             const s = Math.floor(seconds % 60);
             return `${m}:${s.toString().padStart(2, '0')}`;
+        }
+
+        // ===== Toast 提示系统 =====
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <span class="toast-close">&times;</span>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+
+            // 关闭按钮
+            toast.querySelector('.toast-close').addEventListener('click', () => {
+                removeToast(toast);
+            });
+
+            // 自动移除
+            setTimeout(() => {
+                removeToast(toast);
+            }, duration);
+
+            // 显示动画
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+        }
+
+        function removeToast(toast) {
+            if (!toast || !toast.parentNode) return;
+            toast.classList.remove('show');
+            setTimeout(() => {
+                if (toast.parentNode) toast.parentNode.removeChild(toast);
+            }, 300);
+        }
+
+        // ===== 下载音频 =====
+        function downloadAudio(cuePath, index, title, artist) {
+            if (!cuePath || isNaN(index)) {
+                showToast('无效的音频来源', 'error');
+                return;
+            }
+            const url = `/api/audio_segment?cue=${encodeURIComponent(cuePath)}&index=${index}`;
+            showToast('正在下载...', 'info', 1500); // 短暂提示
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) throw new Error('下载失败，状态码 ' + res.status);
+                    return res.blob();
+                })
+                .then(blob => {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    let fileName;
+                    if (title) {
+                        // 清理非法字符
+                        const cleanTitle = title.replace(/[\\/:*?"<>|]/g, '_');
+                        // 如果有 artist，则拼接
+                        if (artist) {
+                            const cleanArtist = artist.replace(/[\\/:*?"<>|]/g, '_');
+                            fileName = `${cleanTitle} - ${cleanArtist}`;
+                        } else {
+                            fileName = cleanTitle;
+                        }
+                    } else {
+                        // fallback: audio_timestamp
+                        const timestamp = Date.now();
+                        fileName = `audio_${timestamp}`;
+                    }
+                    a.download = `${fileName}.mp3`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(a.href);
+                    showToast('下载完成 ✅', 'success');
+                })
+                .catch(err => {
+                    showToast('下载失败: ' + err.message, 'error');
+                });
         }
 
         // ----- 滚动字幕管理 -----
@@ -763,7 +896,7 @@
             if (state.playlist.length === 0) {
                 const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
                 state.playlist = buildPlaylistItems(available);
-                if (state.playlist.length === 0) { alert('播放列表为空'); return; }
+                if (state.playlist.length === 0) { showToast('播放列表为空', 'error'); return; }
                 if (state.playMode === 'shuffle') shuffleArray(state.playlist);
                 state.playIndex = 0;
                 const first = state.playlist[0];
@@ -777,7 +910,7 @@
             if (state.playlist.length === 0) {
                 const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
                 state.playlist = buildPlaylistItems(available);
-                if (state.playlist.length === 0) { alert('播放列表为空'); return; }
+                if (state.playlist.length === 0) { showToast('播放列表为空', 'error'); return; }
                 if (state.playMode === 'shuffle') shuffleArray(state.playlist);
                 state.playIndex = 0;
                 const first = state.playlist[0];
@@ -986,7 +1119,7 @@
         function openSplitModal(parentId) {
             const original = state.songs.find(s => s.id === parentId);
             if (!original) {
-                alert('该条目已不存在，请刷新列表。');
+                showToast('该条目已不存在，请刷新列表。', 'warning');
                 return;
             }
             const allCues = original.cueFiles;
@@ -996,7 +1129,7 @@
             }
             const availableCues = allCues.filter(c => !splitCues.includes(c));
             if (availableCues.length === 0) {
-                alert('该条目所有来源均已拆分，无法再拆分。');
+                showToast('该条目所有来源均已拆分，无法再拆分。', 'warning');
                 return;
             }
             state._pendingSplitParentId = parentId;
@@ -1022,14 +1155,14 @@
             if (!parentId) return;
             const original = state.songs.find(s => s.id === parentId);
             if (!original) {
-                alert('父条目已不存在，请刷新列表。');
+                showToast('父条目已不存在，请刷新列表。', 'warning');
                 closeModal();
                 return;
             }
             const checkboxes = sourceList.querySelectorAll('input[type="checkbox"]:checked');
             const selectedCues = Array.from(checkboxes).map(cb => cb.dataset.cue);
             if (selectedCues.length === 0) {
-                alert('请至少选择一个来源进行拆分。');
+                showToast('请至少选择一个来源进行拆分。', 'error');
                 return;
             }
             let existingSplitCues = [];
@@ -1038,7 +1171,7 @@
             }
             const newCues = selectedCues.filter(c => !existingSplitCues.includes(c));
             if (newCues.length === 0) {
-                alert('所选来源均已拆分，无需重复操作。');
+                showToast('所选来源均已拆分，无需重复操作。', 'info');
                 closeModal();
                 return;
             }
@@ -1063,13 +1196,13 @@
         function mergeBack(subId) {
             const subSong = state.displaySongs.find(s => s.id === subId);
             if (!subSong || !subSong._parentId) {
-                alert('该条目已不存在或已合并，请刷新列表。');
+                showToast('该条目已不存在或已合并，请刷新列表。', 'warning');
                 return;
             }
             const parentId = subSong._parentId;
             const parentExists = state.songs.some(s => s.id === parentId);
             if (!parentExists) {
-                alert('父条目已不存在，无法合并。');
+                showToast('父条目已不存在，无法合并。', 'error');
                 return;
             }
             if (state.splitMap[parentId]) {
@@ -1078,7 +1211,7 @@
                     delete state.splitMap[parentId];
                 }
             } else {
-                alert('父条目已不存在，无法合并。');
+                showToast('父条目已不存在，无法合并。', 'error');
                 return;
             }
             if (state.selected.has(subId)) {
@@ -1413,6 +1546,10 @@
                         `<button class="play-btn" data-cue="${escapeHtml(cue)}" data-index="${idx}" data-song-id="${escapeHtml(song.id)}" data-title="${escapeHtml(rawTitle)}" data-cover="${escapeHtml(coverForCue)}" data-album="${escapeHtml(albumForCue)}" data-artist="${escapeHtml(performerForCue)}" title="播放此来源的曲目片段">▶</button>` :
                         '';
 
+                    const downloadBtn = hasTrack ?
+                        `<button class="download-btn" data-cue="${escapeHtml(cue)}" data-index="${idx}" data-title="${escapeHtml(rawTitle)}" data-artist="${escapeHtml(performerForCue)}" title="下载此来源的曲目">⬇</button>` :
+                        '';
+
                     const performerTag = performerForCue ?
                         `<span class="performer-tag" title="${escapeHtml(performerForCue)}">🎤 ${escapeHtml(performerForCue)}</span>` :
                         '';
@@ -1421,6 +1558,7 @@
                         <span class="cue-file">${escapeHtml(cue)}</span>
                         ${performerTag}
                         ${playBtn}
+                        ${downloadBtn}
                     </span>`;
                 }
 
@@ -1498,6 +1636,16 @@
                     state.playIndex = pos;
                     const item = state.playlist[pos];
                     playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
+                });
+            });
+            songList.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const cuePath = btn.dataset.cue;
+                    const index = parseInt(btn.dataset.index);
+                    const title = btn.dataset.title || '';
+                    const artist = btn.dataset.artist || '';
+                    downloadAudio(cuePath, index, title, artist);
                 });
             });
             songList.querySelectorAll('.split-btn').forEach(btn => {
@@ -1682,13 +1830,13 @@
                 });
                 const data = await resp.json();
                 if (!data.success) {
-                    alert('计算失败: ' + (data.error || '未知错误'));
+                    showToast('计算失败: ' + (data.error || '未知错误'), 'error');
                     return;
                 }
                 state.results = data.schemes;
                 renderResults(data.schemes, data.totalSelected);
             } catch (err) {
-                alert('请求失败: ' + err.message);
+                showToast('请求失败: ' + err.message, 'error');
             } finally {
                 computeBtn.disabled = false;
                 computeBtn.innerHTML = '🧮 计算最佳组合';
@@ -1803,8 +1951,8 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ path: path })
                     }).then(res => res.json()).then(data => {
-                        if (!data.success) alert('打开失败: ' + (data.error || '未知错误'));
-                    }).catch(err => alert('请求失败: ' + err.message));
+                        if (!data.success) showToast('打开失败: ' + (data.error || '未知错误'), 'error');
+                    }).catch(err => showToast('请求失败: ' + err.message, 'error'));
                 });
             });
 
@@ -1902,8 +2050,8 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path: path })
                 }).then(res => res.json()).then(data => {
-                    if (!data.success) alert('打开失败: ' + (data.error || '未知错误'));
-                }).catch(err => alert('请求失败: ' + err.message));
+                    if (!data.success) showToast('打开失败: ' + (data.error || '未知错误'), 'error');
+                }).catch(err => showToast('请求失败: ' + err.message, 'error'));
             }
         });
 
@@ -1941,6 +2089,19 @@
                 importState(this.files[0]);
             }
             this.value = ''; // 允许重复选择同一个文件
+        });
+
+        document.getElementById('playerDownloadBtn').addEventListener('click', function() {
+            if (!currentAudio || state.playlist.length === 0 || state.playIndex === -1) {
+                showToast('当前没有正在播放的歌曲', 'error');
+                return;
+            }
+            const item = state.playlist[state.playIndex];
+            if (!item) {
+                showToast('无法获取当前歌曲信息', 'error');
+                return;
+            }
+            downloadAudio(item.cue, item.index, item.title || '', item.artist || '');
         });
 
         // ===== 初始化 =====

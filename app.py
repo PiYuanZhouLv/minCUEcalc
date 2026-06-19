@@ -199,7 +199,7 @@ def scan_directories(dir_list):
         "cueAlbumMap": {},
         "cueArtistMap": {},
         "cueTrackPerformerMap": {},
-        "cueTrackTitleMap": {}   # 新增：每个 cue 对应的原始曲目标题
+        "cueTrackTitleMap": {}
     })
 
     for root_dir in dir_list:
@@ -215,7 +215,14 @@ def scan_directories(dir_list):
                             content = fp.read()
                         audio_file, tracks, album_title, album_artist = parse_cue_with_times(content, dirpath)
                         if tracks:
-                            CUE_TRACKS_CACHE[full] = {'audio_file': audio_file, 'tracks': tracks}
+                            # 存入缓存（包含专辑、艺术家、封面）
+                            CUE_TRACKS_CACHE[full] = {
+                                'audio_file': audio_file,
+                                'tracks': tracks,
+                                'album': album_title or '',
+                                'artist': album_artist or '',
+                                'cover': cover_path
+                            }
                             album_title = album_title or ''
                             album_artist = album_artist or ''
                             for idx, track in enumerate(tracks):
@@ -237,7 +244,7 @@ def scan_directories(dir_list):
                                 info["cueAlbumMap"][full] = album_title
                                 info["cueArtistMap"][full] = album_artist
                                 info["cueTrackPerformerMap"][full] = performer or ''
-                                info["cueTrackTitleMap"][full] = raw_title   # 新增
+                                info["cueTrackTitleMap"][full] = raw_title
                     except Exception as e:
                         print(f"处理CUE {full} 出错: {e}")
 
@@ -257,7 +264,7 @@ def scan_directories(dir_list):
             "cueAlbumMap": info["cueAlbumMap"],
             "cueArtistMap": info["cueArtistMap"],
             "cueTrackPerformerMap": info["cueTrackPerformerMap"],
-            "cueTrackTitleMap": info["cueTrackTitleMap"],   # 新增
+            "cueTrackTitleMap": info["cueTrackTitleMap"],
             "audioFile": audio_path,
             "cueRef": track_ref[0],
             "trackIndex": track_ref[1],
@@ -281,8 +288,7 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
     target_set = set(selected_titles)
 
     # ----- 1. 构建全量歌曲信息 -----
-    # 扫描所有 song 数据，建立 cue -> 歌曲出现次数的映射
-    cue_all_counts = defaultdict(lambda: defaultdict(int))  # cue_path -> {song_id: count}
+    cue_all_counts = defaultdict(lambda: defaultdict(int))
     all_song_ids = set()
 
     for song in songs:
@@ -291,21 +297,16 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
         for cue_path in song.get('cueFiles', []):
             cue_all_counts[cue_path][sid] += 1
 
-    # 只保留至少与一个目标歌曲有关的 cue？不，非目标歌曲也会带来 extra，所以即使没目标歌曲的 cue 也可能被选（但只会增加成本），
-    # 我们可以提前丢弃“不含任何目标歌曲且不含任何非目标歌曲”的 cue（不可能发生），但保留空 cue 无意义。
-    # 简单起见，保留所有 cue，由求解器决定。
     cue_paths = list(cue_all_counts.keys())
     if not cue_paths:
         return []
 
-    # 分配歌曲 ID 索引
     all_songs = sorted(all_song_ids)
     song_to_idx = {sid: i for i, sid in enumerate(all_songs)}
     target_idx = {song_to_idx[t] for t in target_set}
     total_songs = len(all_songs)
     total_targets = len(target_set)
 
-    # 构建每个 cue 的计数数组（长度为 total_songs）
     cue_counts = []
     for fp in cue_paths:
         cnt_dict = cue_all_counts[fp]
@@ -318,38 +319,29 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
     def build_base_model():
         model = cp_model.CpModel()
 
-        # 变量：是否选中 cue
         x = [model.NewBoolVar(f'x_{i}') for i in range(len(cue_paths))]
 
-        # 每首歌的总出现次数（上界：所有 cue 计数之和）
         max_cnt = [sum(cue_counts[i][s] for i in range(len(cue_paths))) for s in range(total_songs)]
         cnt = [model.NewIntVar(0, max_cnt[s], f'cnt_{s}') for s in range(total_songs)]
 
-        # 目标歌曲缺失标志（布尔）
         miss = [model.NewBoolVar(f'miss_{t}') for t in range(total_targets)]
 
-        # 多余数（整数）
         extra = [model.NewIntVar(0, max_cnt[s], f'extra_{s}') for s in range(total_songs)]
 
-        # 约束：计数
         for s in range(total_songs):
             model.Add(cnt[s] == sum(cue_counts[i][s] * x[i] for i in range(len(cue_paths))))
 
-        # 缺失约束：对每个目标歌曲 t（原始索引 target_idx 转换为 miss 数组索引）
-        # 建立 target_idx 到 miss 数组索引的映射
-        target_list = sorted(target_idx)  # 保持固定顺序，与 miss 数组对应
+        target_list = sorted(target_idx)
         t_to_miss_idx = {t: idx for idx, t in enumerate(target_list)}
         for t in target_idx:
             mi = t_to_miss_idx[t]
             model.Add(cnt[t] >= 1 - miss[mi])
 
-        # 多余约束
         for s in range(total_songs):
             need = 1 if s in target_idx else 0
             model.Add(extra[s] >= cnt[s] - need)
             model.Add(extra[s] >= 0)
 
-        # 目标函数
         cue_cost = w_c * sum(x)
         miss_cost = w_m * sum(miss)
         extra_cost = w_e * sum(extra)
@@ -362,23 +354,17 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
     solver = cp_model.CpSolver()
     if time_limit:
         solver.parameters.max_time_in_seconds = time_limit
-    solver.parameters.num_search_workers = 8  # 多线程加速
+    solver.parameters.num_search_workers = 8
 
-    # ----- 3. 迭代收集前 K 个解 -----
-    solutions = []   # 元素: (cost, selected_indices, miss_songs, extra_dict)
-    # 用于禁止已找到解的约束存储
-    forbidden_selections = []
-
+    solutions = []
     while len(solutions) < K:
         status = solver.Solve(model)
         if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             break
 
-        # 提取解
         selected = [i for i, var in enumerate(x) if solver.Value(var)]
         cost_val = solver.ObjectiveValue()
 
-        # 计算缺失和多余详情
         miss_songs = []
         for t in target_idx:
             mi = target_list.index(t)
@@ -393,32 +379,23 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
 
         solutions.append((cost_val, selected, miss_songs, extra_detail))
 
-        # 禁止当前精确组合（不允许再次选出完全相同的 cue 子集）
         if not selected:
-            # 极少情况：一个 cue 都不选，禁止空集
             model.Add(sum(x) >= 1)
         else:
-            # 禁止该解的标准方式
             model.Add(
                 sum(x[i] for i in selected) -
                 sum(x[i] for i in range(len(cue_paths)) if i not in selected)
                 <= len(selected) - 1
             )
 
-        # 可选：若解的目标值过大，可设置全局上界提前停止，但迭代排除法无需此操作
-
-    # ----- 4. 整理结果输出 -----
     schemes = []
     for cost_val, selected, miss_songs, extra_detail in solutions:
-        # 选中的 cue 文件信息
         cue_files_info = []
         for idx in selected:
             fp = cue_paths[idx]
-            # 该 cue 中包含的歌曲（按 song id 列出，去重显示）
             contained = [all_songs[s] for s, c in enumerate(cue_counts[idx]) if c > 0]
             cue_files_info.append({"path": fp, "songs": list(set(contained))})
 
-        # 覆盖情况
         covered = [sid for sid in target_set if sid not in miss_songs]
         extra_ids = []
         for sid, cnt in extra_detail.items():
@@ -439,7 +416,6 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
             "_cost": cost_val
         })
 
-    # 按 diff 和 coverage 二次排序（可选），但主排序已是 _cost 升序
     schemes.sort(key=lambda x: (x["_cost"], x["diff"], -x["coverage"]))
     return schemes[:K]
 
@@ -516,11 +492,18 @@ def audio_segment():
         try:
             with open(cue_path, 'r', encoding='utf-8-sig', errors='ignore') as f:
                 content = f.read()
-            audio_file, tracks = parse_cue_with_times(content, os.path.dirname(cue_path))
-            cache = {'audio_file': audio_file, 'tracks': tracks}
+            audio_file, tracks, album_title, album_artist = parse_cue_with_times(content, os.path.dirname(cue_path))
+            cover_path = find_cover_image(os.path.dirname(cue_path), os.path.basename(cue_path))
+            cache = {
+                'audio_file': audio_file,
+                'tracks': tracks,
+                'album': album_title or '',
+                'artist': album_artist or '',
+                'cover': cover_path
+            }
             CUE_TRACKS_CACHE[cue_path] = cache
-        except:
-            abort(500, "无法解析CUE文件")
+        except Exception as e:
+            abort(500, f"无法解析CUE文件: {str(e)}")
 
     if track_index >= len(cache['tracks']):
         abort(404, "曲目索引超出范围")
@@ -536,12 +519,45 @@ def audio_segment():
     if duration <= 0:
         duration = 60
 
-    key = hashlib.md5(f"{audio_file}_{start}_{end}".encode()).hexdigest()
+    # 获取元数据
+    album = cache.get('album', '')
+    artist = cache.get('artist', '')
+    cover = cache.get('cover')
+    title = track.get('title', '')
+    performer = track.get('performer') or artist
+
+    # 缓存键（包含所有元数据，保证不同元数据独立缓存）
+    meta_str = f"{title}_{performer}_{album}_{cover if cover else ''}"
+    key = hashlib.md5(f"{audio_file}_{start}_{end}_{meta_str}".encode()).hexdigest()
     cache_file = os.path.join(CACHE_DIR, f"{key}.mp3")
 
     if not os.path.exists(cache_file):
-        cmd = ['ffmpeg', '-ss', str(start), '-to', str(end), '-i', audio_file,
-               '-acodec', 'libmp3lame', '-ab', '192k', '-y', cache_file]
+        cmd = ['ffmpeg', '-ss', str(start), '-to', str(end), '-i', audio_file]
+
+        # 如果有封面，将封面作为第二个输入
+        if cover and os.path.exists(cover):
+            cmd.extend(['-i', cover])
+            cmd.extend(['-map', '0:a', '-map', '1'])          # 音频流 0，封面流 1
+            cmd.extend(['-c:v', 'copy'])                     # 封面直接复制（不重新编码）
+            cmd.extend(['-id3v2_version', '3'])              # 启用 ID3v2.3 以支持内嵌封面
+            cmd.extend(['-metadata:s:v', 'title="Album cover"'])
+            cmd.extend(['-metadata:s:v', 'comment="Cover (front)"'])
+        else:
+            cmd.extend(['-map', '0:a'])                      # 仅音频
+
+        # 音频编码
+        cmd.extend(['-acodec', 'libmp3lame', '-ab', '192k'])
+
+        # 元数据标签
+        if title:
+            cmd.extend(['-metadata', f'title={title}'])
+        if performer:
+            cmd.extend(['-metadata', f'artist={performer}'])
+        if album:
+            cmd.extend(['-metadata', f'album={album}'])
+
+        cmd.extend(['-y', cache_file])
+
         try:
             subprocess.run(cmd, capture_output=True, check=True, timeout=60)
         except subprocess.CalledProcessError as e:
@@ -578,7 +594,6 @@ def api_open_file():
         elif system == 'Darwin':  # macOS
             subprocess.Popen(['open', '-R', filepath])
         else:  # Linux
-            # 尝试常见的文件管理器
             for cmd in [['nautilus', '--select'], ['dolphin', '--select'], ['thunar', '--select']]:
                 try:
                     subprocess.Popen(cmd + [filepath])
