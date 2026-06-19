@@ -142,6 +142,11 @@
             </div>
             <div class="dir-list" id="dirList"></div>
             <div id="scanStatus" style="margin-top:8px;font-size:14px;color:#475569;"></div>
+            <div style="margin-top:12px; display:flex; gap:10px;">
+                <button class="btn btn-outline" id="exportStateBtn">💾 导出状态</button>
+                <button class="btn btn-outline" id="importStateBtn">📂 导入状态</button>
+                <input type="file" id="importFileInput" accept=".json" style="display:none;" />
+            </div>
         </div>
         <hr />
         <div class="main-layout">
@@ -528,7 +533,9 @@
             }
             const playItem = state.playlist[state.playIndex];
             if (!playItem) { playerStatus.textContent = '无有效播放项'; return; }
-            const audioUrl = `/api/audio_segment?cue=${encodeURIComponent(playItem.cue)}&index=${playItem.index}`;
+            const cue = playItem.cue;
+            const idx = playItem.index;
+            const audioUrl = `/api/audio_segment?cue=${encodeURIComponent(cue)}&index=${idx}`;
             const audio = new Audio(audioUrl);
             currentAudio = audio;
             currentSongId = playItem.songId;
@@ -628,7 +635,7 @@
             }
             let nextIdx = state.playIndex + 1;
             if (nextIdx >= state.playlist.length) {
-                if (state.playMode === 'shuffle') {
+                if (state.playMode === 'shuffle' || state.playMode === 'sequential') {
                     // 随机模式：不重新打乱，从头循环
                     state.playIndex = 0;
                     const item = state.playlist[0];
@@ -653,30 +660,103 @@
             let idx = modes.indexOf(state.playMode);
             idx = (idx + 1) % modes.length;
             const newMode = modes[idx];
-            // 如果切换到 shuffle 且当前有播放列表和当前歌曲
-            if (newMode === 'shuffle' && state.playlist.length > 0 && currentSongId) {
-                const currentItem = state.playlist[state.playIndex];
+
+            // 保存当前歌曲信息（如果有）
+            let currentItem = null;
+            if (state.playIndex >= 0 && state.playIndex < state.playlist.length) {
+                currentItem = state.playlist[state.playIndex];
+            } else if (currentSongId) {
+                // 如果播放索引无效但仍有 currentSongId，尝试从 playlist 中查找
+                currentItem = state.playlist.find(item => item.songId === currentSongId);
+            }
+
+            // 如果播放列表为空或当前歌曲不存在，从 displaySongs 构建基础列表
+            let baseList = [];
+            if (state.playlist.length === 0) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                baseList = buildPlaylistItems(available);
+            } else {
+                baseList = state.playlist.slice(); // 复制当前列表
+            }
+
+            // 如果 currentItem 为 null 且 playlist 非空，取第一个
+            if (!currentItem && baseList.length > 0) {
+                currentItem = baseList[0];
+            }
+
+            let newList = [];
+            if (newMode === 'shuffle') {
+                // 随机模式：当前歌曲置顶，其余随机
                 if (currentItem) {
-                    const filtered = state.playlist.filter(item => item.songId !== currentSongId);
-                    shuffleArray(filtered);
-                    const newList = [currentItem, ...filtered];
-                    state.playlist = newList;
-                    state.playIndex = 0;
-                    if (!currentAudio || currentAudio.ended) {
-                        playSong(currentItem.cue, currentItem.index, currentItem.title, currentItem.cover, currentItem.album, currentItem.artist, currentItem.songId, false, true);
+                    const rest = baseList.filter(item => item.songId !== currentItem.songId);
+                    shuffleArray(rest);
+                    newList = [currentItem, ...rest];
+                } else {
+                    newList = baseList.slice();
+                    shuffleArray(newList);
+                }
+            } else {
+                // 顺序模式：按照 displaySongs 顺序排列，当前歌曲置顶
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                const ordered = buildPlaylistItems(available);
+                if (currentItem) {
+                    // 检查 currentItem 是否在 ordered 中（通过 songId 比较）
+                    const exists = ordered.some(item => item.songId === currentItem.songId);
+                    if (exists) {
+                        const rest = ordered.filter(item => item.songId !== currentItem.songId);
+                        newList = [currentItem, ...rest];
                     } else {
-                        playerStatus.textContent = '随机模式已切换';
+                        // 当前歌曲不在有序列表中，插入首位
+                        newList = [currentItem, ...ordered];
+                    }
+                } else {
+                    newList = ordered;
+                }
+            }
+
+            // 如果 newList 为空，尝试从 displaySongs 构建
+            if (newList.length === 0) {
+                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
+                newList = buildPlaylistItems(available);
+                if (currentItem) {
+                    // 检查是否包含，不包含则插入
+                    if (!newList.some(item => item.songId === currentItem.songId)) {
+                        newList = [currentItem, ...newList];
                     }
                 }
-            } else if (newMode === 'shuffle' && state.playlist.length > 0 && !currentSongId) {
-                shuffleArray(state.playlist);
-                state.playIndex = 0;
-                const first = state.playlist[0];
-                if (first) playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, false, true);
             }
+
+            state.playlist = newList;
             state.playMode = newMode;
             this.textContent = icons[idx];
             this.title = titles[idx];
+
+            // 更新索引：找到当前歌曲（如果存在）
+            if (currentItem) {
+                const pos = state.playlist.findIndex(item => item.songId === currentItem.songId);
+                if (pos !== -1) {
+                    state.playIndex = pos;
+                } else {
+                    state.playIndex = 0; // 理论不会发生，但防御
+                }
+            } else {
+                state.playIndex = 0;
+            }
+
+            // 如果当前没有播放或已结束，播放第一首
+            if (!currentAudio || currentAudio.ended) {
+                if (state.playlist.length > 0) {
+                    const first = state.playlist[state.playIndex] || state.playlist[0];
+                    playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, false, true);
+                }
+            } else {
+                // 正在播放：更新显示信息，保持音频不变
+                const item = state.playlist[state.playIndex];
+                if (item) {
+                    showPlayer(item.title, item.cover, item.album, item.artist);
+                    currentSongId = item.songId;
+                }
+            }
         });
 
         document.getElementById('playerPrevBtn').addEventListener('click', function() {
@@ -971,9 +1051,9 @@
                     state.selected.add(sid);
                 }
             }
-            state.playlist = [];
-            state.playIndex = -1;
-            if (currentAudio) { hidePlayer(); }
+            // state.playlist = [];
+            // state.playIndex = -1;
+            // if (currentAudio) { hidePlayer(); }
             state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
             saveState();
             updateUI();
@@ -1008,9 +1088,9 @@
                     state.selected.add(parentId);
                 }
             }
-            state.playlist = [];
-            state.playIndex = -1;
-            if (currentAudio) { hidePlayer(); }
+            // state.playlist = [];
+            // state.playIndex = -1;
+            // if (currentAudio) { hidePlayer(); }
             state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
             saveState();
             updateUI();
@@ -1047,6 +1127,75 @@
                 if (!raw) return null;
                 return JSON.parse(raw);
             } catch (e) { return null; }
+        }
+
+        // ===== 导出状态 =====
+        function exportState() {
+            const data = {
+                dirs: state.dirs,
+                splitMap: state.splitMap,
+                selected: Array.from(state.selected),
+                version: 3,
+                exportedAt: new Date().toISOString()
+            };
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `cue_state_${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            scanStatus.textContent = '✅ 状态已导出';
+            scanStatus.style.color = '#10b981';
+        }
+
+        // ===== 导入状态 =====
+        function importState(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    // 校验必要字段
+                    if (!data.dirs || !data.splitMap || !data.selected) {
+                        throw new Error('无效的状态文件，缺少必要字段');
+                    }
+                    // 更新状态
+                    state.dirs = data.dirs || [];
+                    state.splitMap = data.splitMap || {};
+                    state.selected = new Set(data.selected || []);
+                    state._pendingSelected = null; // 清除待恢复选择
+                    
+                    // 清空旧数据
+                    state.songs = [];
+                    state.displaySongs = [];
+                    state.playlist = [];
+                    state.playIndex = -1;
+                    if (currentAudio) hidePlayer();
+                    
+                    // 重新渲染目录
+                    renderDirs();
+                    // 如果目录非空，自动扫描
+                    if (state.dirs.length > 0) {
+                        scanAll(); // 扫描完成后会重建 displaySongs 并恢复选择
+                    } else {
+                        state.displaySongs = [];
+                        renderSongs();
+                        updateSelectedPanel();
+                        updateComputeBtn();
+                    }
+                    saveState(); // 保存到 localStorage
+                    scanStatus.textContent = '✅ 状态导入成功，已开始扫描';
+                    scanStatus.style.color = '#10b981';
+                } catch (err) {
+                    scanStatus.textContent = '❌ 导入失败: ' + err.message;
+                    scanStatus.style.color = '#ef4444';
+                    console.error('导入状态错误:', err);
+                }
+            };
+            reader.readAsText(file);
         }
 
         function restoreState() {
@@ -1303,16 +1452,52 @@
                     e.stopPropagation();
                     const cuePath = btn.dataset.cue;
                     const index = parseInt(btn.dataset.index);
+                    const songId = btn.dataset.songId;
                     const title = btn.dataset.title || '未知歌曲';
                     const cover = btn.dataset.cover || '';
                     const album = btn.dataset.album || '';
                     const artist = btn.dataset.artist || '';
-                    const songId = btn.dataset.songId;
                     if (!cuePath || isNaN(index)) {
                         console.warn('缺少 cue 或 index');
                         return;
                     }
-                    playSong(cuePath, index, title, cover, album, artist, songId, true, true);
+
+                    // 在播放列表中查找或更新该歌曲条目
+                    let pos = state.playlist.findIndex(item => item.songId === songId);
+                    if (pos === -1) {
+                        // 如果不在播放列表中，尝试从 displaySongs 构建默认条目
+                        const song = state.displaySongs.find(s => s.id === songId);
+                        if (song) {
+                            // 使用当前按钮的数据构建条目
+                            const item = {
+                                cue: cuePath,
+                                index: index,
+                                title: title,
+                                cover: cover,
+                                album: album,
+                                artist: artist,
+                                songId: songId
+                            };
+                            state.playlist.push(item);
+                            pos = state.playlist.length - 1;
+                        } else {
+                            console.warn('未找到歌曲:', songId);
+                            return;
+                        }
+                    } else {
+                        // 更新已有条目的所有元数据
+                        state.playlist[pos].cue = cuePath;
+                        state.playlist[pos].index = index;
+                        state.playlist[pos].title = title;
+                        state.playlist[pos].cover = cover;
+                        state.playlist[pos].album = album;
+                        state.playlist[pos].artist = artist;
+                    }
+
+                    // 设置当前播放索引并播放（不重建列表）
+                    state.playIndex = pos;
+                    const item = state.playlist[pos];
+                    playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
                 });
             });
             songList.querySelectorAll('.split-btn').forEach(btn => {
@@ -1742,6 +1927,20 @@
             document.querySelectorAll('.cue-path').forEach(el => {
                 el.classList.remove('ctrl-hover');
             });
+        });
+
+        // ===== 导出/导入事件绑定 =====
+        document.getElementById('exportStateBtn').addEventListener('click', exportState);
+
+        document.getElementById('importStateBtn').addEventListener('click', function() {
+            document.getElementById('importFileInput').click();
+        });
+
+        document.getElementById('importFileInput').addEventListener('change', function(e) {
+            if (this.files && this.files.length > 0) {
+                importState(this.files[0]);
+            }
+            this.value = ''; // 允许重复选择同一个文件
         });
 
         // ===== 初始化 =====
