@@ -136,7 +136,7 @@
         #exportModal .progress-area .log { max-height: 150px; overflow-y: auto; font-size: 12px; background: #fafbfc; padding: 8px; border-radius: 6px; margin-top: 8px; }
         #exportModal .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
-        .song-item .sources .cue-path.ctrl-hover { cursor: alias; background: rgba(59, 130, 246, 0.08); border-radius: 4px; }
+        .song-item .sources .ctrl-hover .cue-file { cursor: alias; color: rgb(59, 130, 246); text-decoration: underline; }
 
         /* Toast 样式 */
         .toast {
@@ -765,7 +765,7 @@
             }
             const nextIdx = state.playIndex + 1;
             if (nextIdx >= state.playlist.length) {
-                if (mode === 'shuffle') {
+                if (mode === 'shuffle' || mode === 'sequential') {
                     state.playIndex = 0;
                     const nextItem = state.playlist[0];
                     if (nextItem) { playSong(nextItem.cue, nextItem.index, nextItem.title, nextItem.cover, nextItem.album, nextItem.artist, nextItem.songId, false, false); }
@@ -1991,8 +1991,7 @@
         // ===== 播放器标题点击滚动 =====
         document.getElementById('playerTitle').addEventListener('click', function() {
             if (!currentSongId) {
-                playerStatus.textContent = '当前无播放歌曲';
-                setTimeout(() => { if (currentAudio) playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中'; }, 2000);
+                showToast('当前无播放歌曲', 'error');
                 return;
             }
             const targetItem = findSongElementById(currentSongId);
@@ -2002,9 +2001,8 @@
                 targetItem.style.background = '#fef3c7';
                 setTimeout(() => { targetItem.style.background = ''; }, 1500);
             } else {
-                playerStatus.textContent = '歌曲未在列表中';
+                showToast('歌曲未在列表中', 'error');
                 console.warn('未找到歌曲元素:', currentSongId);
-                setTimeout(() => { if (currentAudio) playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中'; }, 2000);
             }
         });
 
