@@ -434,7 +434,7 @@ def export_song(output, format, file, start=None, end=None, extra=None):
     if not extra:
         extra = {}
     target = os.path.splitext(file)[1].lower().lstrip('.') if format == 'keep' else format
-    print(1)
+
     codec_map = {
         'mp3':  {'codec': 'libmp3lame', 'bitrate': '192k', 'ext': 'mp3', 'extra_args': []},
         'flac': {'codec': 'flac',       'bitrate': None,  'ext': 'flac', 'extra_args': []},
@@ -444,7 +444,6 @@ def export_song(output, format, file, start=None, end=None, extra=None):
         'wav':  {'codec': 'pcm_s16le',  'bitrate': None,  'ext': 'wav', 'extra_args': []},
     }
     fmt_info = codec_map[target]
-    print(2)
 
     cmd = ['ffmpeg']
 
@@ -453,7 +452,6 @@ def export_song(output, format, file, start=None, end=None, extra=None):
     if end:
         cmd += ['-to', str(end)]
     cmd += ['-i', file]
-    print(3)
 
     has_cover = False
     if extra.get('cover') and target in ['mp3', 'flac', 'aac']:
@@ -468,7 +466,6 @@ def export_song(output, format, file, start=None, end=None, extra=None):
         ]
     else:
         cmd += ['-map', '0:a']
-    print(4)
 
     cmd += ['-map_metadata', '-1']
     if format != 'keep':
@@ -477,9 +474,8 @@ def export_song(output, format, file, start=None, end=None, extra=None):
             cmd += ['-b:a', fmt_info['bitrate']]
         if fmt_info['extra_args']:
             cmd += fmt_info['extra_args']
-    else:
-        cmd += ['-c:a', 'copy']
-    print(5)
+    # else:
+    #     cmd += ['-c:a', 'copy']
 
     if fmt_info['codec'] == 'libmp3lame':
         cmd += ['-id3v2_version', '3']
@@ -495,14 +491,12 @@ def export_song(output, format, file, start=None, end=None, extra=None):
         cmd.extend(['-metadata', f'album={extra["album"]}'])
     if 'album_artist' in extra:
         cmd.extend(['-metadata', f'album_artist={extra["album_artist"]}'])
-    print(6)
 
     cmd += ['-y', output]
 
     print(cmd)
 
     subprocess.run(cmd, capture_output=True, check=True, text=True, encoding='utf-8', timeout=120)
-    print(7)
 
 def get_cached_segment(audio_file, start = None, end = None, extra = None):
     """生成音频片段并返回缓存文件路径，支持 album_artist 元数据"""
