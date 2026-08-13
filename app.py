@@ -468,12 +468,12 @@ def export_song(output, format, file, start=None, end=None, extra=None):
         cmd += ['-map', '0:a']
 
     cmd += ['-map_metadata', '-1']
-    if format != 'keep':
-        cmd += ['-acodec', fmt_info['codec']]
-        if fmt_info['bitrate']:
-            cmd += ['-b:a', fmt_info['bitrate']]
-        if fmt_info['extra_args']:
-            cmd += fmt_info['extra_args']
+    # if format != 'keep':
+    cmd += ['-acodec', fmt_info['codec']]
+    if fmt_info['bitrate']:
+        cmd += ['-b:a', fmt_info['bitrate']]
+    if fmt_info['extra_args']:
+        cmd += fmt_info['extra_args']
     # else:
     #     cmd += ['-c:a', 'copy']
 
