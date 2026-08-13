@@ -1,20 +1,22 @@
 import os
 import re
-import random
 import unicodedata
 import ctypes
 import subprocess
 import hashlib
 import tempfile
-import shutil
-import time
 import json
+import glob
+from pathlib import Path
 from collections import defaultdict
 from flask import Flask, request, jsonify, render_template, send_file, abort, Response, stream_with_context
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+
+AUDIO_EXT = ['.wav', '.flac', '.mp3', '.m4a', '.tak', '.ogg', '.acc']
+IMAGE_EXT = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']
 
 # ---------- Windows DPI 感知 ----------
 try:
@@ -26,8 +28,7 @@ import tkinter as tk
 from tkinter import filedialog
 
 # ---------- 全局缓存 ----------
-CUE_TRACKS_CACHE = {}
-CACHE_DIR = os.path.join(tempfile.gettempdir(), 'cue_audio_cache')
+CACHE_DIR = os.path.join(tempfile.gettempdir(), 'minCUEcalc_cache')
 os.makedirs(CACHE_DIR, exist_ok=True)
 
 # ---------- 规范化 ----------
@@ -49,232 +50,205 @@ def parse_index_time(time_str):
     else:
         return 0.0
 
+def ffprobe(entries, file):
+    try:
+        cmd = ['ffprobe', '-v', 'error', '-show_entries', entries,
+               '-of', 'default=noprint_wrappers=1:nokey=1', file]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10, encoding='utf-8')
+        if result.returncode == 0 and result.stdout.strip():
+            return result.stdout.strip()
+    except:
+        pass
+    return None
+
 def get_audio_duration(filepath):
     try:
-        cmd = ['ffprobe', '-v', 'error', '-show_entries', 'format=duration',
-               '-of', 'default=noprint_wrappers=1:nokey=1', filepath]
-        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
-        if result.returncode == 0 and result.stdout.strip():
-            return float(result.stdout.strip())
+        return float(ffprobe('format=duration', filepath))
     except:
         pass
     return None
 
 # ---------- 查找封面 ----------
-def find_cover_image(cue_dir, cue_basename):
-    if not os.path.isdir(cue_dir):
-        return None
-    exts = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp']
+def find_cover_image(cue):
+    cue_dir, cue_basename = os.path.split(cue)
+    exts = IMAGE_EXT
     cue_base = os.path.splitext(cue_basename)[0]
-    candidates = [cue_base, 'cover', 'folder', 'front', 'album', 'art']
+    candidates = [cue_base, 'cover', 'front', 'album', 'art']
     if '-' in cue_base:
-        parts = cue_base.split('-')
-        if parts[0]:
-            candidates.append(parts[0])
+        candidates.append(cue_base.rsplit('-', 1)[0])
     candidates = list(set(candidates))
     for name in candidates:
         for ext in exts:
             candidate_path = os.path.join(cue_dir, name + ext)
             if os.path.exists(candidate_path):
-                return candidate_path
-    for f in os.listdir(cue_dir):
-        if f.lower().endswith(tuple(exts)):
-            image_base = os.path.splitext(f)[0]
-            if cue_base.startswith(image_base) and image_base:
-                return os.path.join(cue_dir, f)
+                return Path(candidate_path).resolve().as_posix()
+    imgs = list(filter(lambda x: any(x.endswith(y) for y in exts), os.listdir(cue_dir)))
+    if len(imgs) == 1:
+        return Path(os.path.join(cue_dir, imgs[0])).resolve().as_posix()
+    for f in imgs:
+        image_base = os.path.splitext(f)[0]
+        if cue_base.startswith(image_base) and image_base:
+            return Path(os.path.join(cue_dir, f)).resolve().as_posix()
     return None
 
+def has_embedded_cover(fn):
+    return 'video' in ffprobe('stream=codec_type', fn)
+
 # ---------- 解析 CUE（支持 INDEX 00/01，返回 track 表演者） ----------
-def parse_cue_with_times(content, cue_dir=''):
-    audio_file = None
+def parse_cue(cue):
+    audio = None
     tracks = []
     album_title = None
     album_artist = None
-    global_performer = None
     current_track = None
-    seen_track = False
-    index00 = None
-    index01 = None
+    head = True
+    first = False
 
-    try:
-        lines = content.splitlines()
-        for line in lines:
-            line = line.strip()
-            if line.upper().startswith('FILE '):
-                m = re.search(r'FILE\s+"(.*?)"', line, re.IGNORECASE)
-                if m:
-                    audio_file = m.group(1).strip()
-                    if cue_dir and not os.path.isabs(audio_file):
-                        audio_file = os.path.join(cue_dir, audio_file)
-            elif line.upper().startswith('PERFORMER '):
-                m = re.search(r'PERFORMER\s+"(.*?)"', line, re.IGNORECASE)
-                if m:
-                    performer = m.group(1).strip()
-                    if not seen_track:
-                        album_artist = performer
-                        global_performer = performer
-                    else:
-                        if current_track:
-                            current_track['performer'] = performer
-            elif line.upper().startswith('TITLE '):
-                m = re.search(r'TITLE\s+"(.*?)"', line, re.IGNORECASE)
-                if m:
-                    title = m.group(1).strip()
-                    if not seen_track:
-                        album_title = title
-                    else:
-                        if current_track:
-                            current_track['title'] = title
-            elif line.upper().startswith('TRACK '):
-                if current_track is not None:
-                    current_track['start'] = index01 if index01 is not None else index00
-                    current_track['index00'] = index00
-                    current_track['index01'] = index01
-                    tracks.append(current_track)
-                current_track = {
-                    'title': None,
-                    'performer': None,
-                    'start': None,
-                    'end': None,
-                    'index00': None,
-                    'index01': None
-                }
-                index00 = None
-                index01 = None
-                seen_track = True
-            elif line.upper().startswith('INDEX 00 '):
-                m = re.search(r'INDEX\s+00\s+(.*?)$', line, re.IGNORECASE)
-                if m:
-                    index00 = parse_index_time(m.group(1))
-            elif line.upper().startswith('INDEX 01 '):
-                m = re.search(r'INDEX\s+01\s+(.*?)$', line, re.IGNORECASE)
-                if m:
-                    index01 = parse_index_time(m.group(1))
+    for line in open(cue, encoding='utf-8-sig', errors='ignore'):
+        line = line.strip()
 
-        if current_track is not None:
-            current_track['start'] = index01 if index01 is not None else index00
-            current_track['index00'] = index00
-            current_track['index01'] = index01
-            tracks.append(current_track)
+        if m := re.search(r'FILE\s+"(.*?)"', line, re.IGNORECASE):
+            if audio:
+                tracks[-1]['duration'] = max(0, (get_audio_duration(audio) or 0) - tracks[-1]['start'])
+            audio = Path(os.path.join(os.path.dirname(cue), m.group(1).strip())).resolve().as_posix()
+            first = True
+        elif m := re.search(r'PERFORMER\s+"(.*?)"', line, re.IGNORECASE):
+            performer = m.group(1).strip()
+            if head:
+                album_artist = performer
+            else:
+                current_track['performer'] = performer
+        elif m := re.search(r'TITLE\s+"(.*?)"', line, re.IGNORECASE):
+            title = m.group(1).strip()
+            if head:
+                album_title = title
+            else:
+                current_track['title'] = title
+                current_track['norm'] = normalize_title(title)
+        elif line.upper().startswith('TRACK'):
+            head = False
+            if current_track:
+                tracks.append(current_track)
+            current_track = {
+                "title": "Untitled",
+                "norm": "Untitled",
+                "performer": album_artist or "Unknown Artist",
+                "file": audio,
+                "start": None,
+                "end": None
+            }
+        elif m := re.search(r'INDEX\s+00\s+(.*?)$', line, re.IGNORECASE):
+            t = parse_index_time(m.group(1).strip())
+            tracks[-1]['end'] = max(t, tracks[-1]['start'])
+            tracks[-1]['duration'] = max(0, t - tracks[-1]['start'])
+        elif m := re.search(r'INDEX\s+01\s+(.*?)$', line, re.IGNORECASE):
+            t = parse_index_time(m.group(1).strip())
+            current_track['start'] = t
+            if not first and not tracks[-1]['end']:
+                tracks[-1]['end'] = max(t, tracks[-1]['start'])
+                tracks[-1]['duration'] = max(0, t - tracks[-1]['start'])
+            first = False
+    tracks.append(current_track)
+    tracks[-1]['duration'] = max(0, (get_audio_duration(audio) or 0) - tracks[-1]['start'])
+    return {
+        "name": Path(cue).name,
+        "title": album_title,
+        "type": "album",
+        "performer": album_artist,
+        "file": Path(cue).resolve().as_posix(),
+        "cover": find_cover_image(cue),
+        "tracks": tracks
+    }
 
-        for track in tracks:
-            if not track.get('performer'):
-                track['performer'] = album_artist
+def parse_audios(dir):
+    audios = list(filter(lambda fn: any(fn.endswith(ext) for ext in AUDIO_EXT), os.listdir(dir)))
+    tracks = []
+    for fn in audios:
+        tracks.append({
+            "title": (title := (ffprobe('format_tags=title', os.path.join(dir, fn)) or os.path.splitext(os.path.split(fn)[1])[0])),
+            "norm": normalize_title(title),
+            "performer": ffprobe('format_tags=artist', os.path.join(dir, fn)) or ffprobe('format_tags=album_artist', os.path.join(dir, fn)) or "Unknown Artist",
+            "file": (Path(dir) / fn).resolve().as_posix(),
+            "start": None,
+            "end": None,
+            "duration": get_audio_duration(os.path.join(dir, fn)),
+            "_album": ffprobe('format_tags=album', os.path.join(dir, fn)),
+            "_album_performer": ffprobe('format_tags=album_artist', os.path.join(dir, fn)),
+            "_index": ffprobe('format_tags=track', os.path.join(dir, fn)),
+            "_fn": os.path.splitext(fn)[0]
+        })
+    albums = {}
+    for track in tracks:
+        album_name = track.pop('_album') or Path(dir).name
+        if album_name not in albums:
+            albums[album_name] = {
+                "name": album_name,
+                "title": album_name,
+                "type": "album",
+                "performer": None,
+                "cover": None,
+                "tracks": []
+            }
+        albums[album_name]['tracks'].append(track)
+    result = []
+    for album in albums.values():
+        album['tracks'].sort(key=lambda x: (x['_index'], tuple(map(lambda y: int(y) if y.isdigit() else y.lower(), re.split(r'(\d+)', track['_fn'])))))
+        album['performer'] = next(filter(lambda x: x, [track['_album_performer'] for track in album['tracks']]), None)
+        album['cover'] = '[EMBEDDED]' if any(has_embedded_cover(track['file']) for track in album['tracks']) else find_cover_image(Path(dir) / album['name'])
+        [[track.pop(k) for k in list(track.keys()) if k.startswith('_')] for track in album['tracks']]
+        result.append(album)
+    return result
 
-        # 计算结束时间
-        if tracks and audio_file and os.path.exists(audio_file):
-            duration = get_audio_duration(audio_file)
-            for i in range(len(tracks)):
-                if i + 1 < len(tracks):
-                    next_track = tracks[i+1]
-                    end_time = next_track.get('index00') or next_track.get('index01') or next_track.get('start')
-                    tracks[i]['end'] = end_time
-                else:
-                    if duration is not None:
-                        tracks[i]['end'] = duration
-                    else:
-                        tracks[i]['end'] = tracks[i]['start'] + 300
+def scan_dir(dir, sub=False):
+    content = []
+    for subdir in filter(os.path.isdir, map(lambda x: os.path.join(dir, x), os.listdir(dir))):
+        content.append(scan_dir(os.path.join(dir, subdir), sub=True))
+    if any(any(fn.endswith(ext) for ext in AUDIO_EXT) for fn in os.listdir(dir)):
+        if any(fn.endswith('.cue') for fn in os.listdir(dir)):
+
+            for cue in filter(lambda fn: fn.endswith('.cue'), os.listdir(dir)):
+                content.append(parse_cue(os.path.join(dir, cue)))
         else:
-            for i in range(len(tracks)):
-                if i + 1 < len(tracks):
-                    next_track = tracks[i+1]
-                    end_time = next_track.get('index00') or next_track.get('index01') or next_track.get('start')
-                    tracks[i]['end'] = end_time
-                else:
-                    tracks[i]['end'] = tracks[i]['start'] + 300
+            content.extend(parse_audios(dir))
+    return {
+        "name": Path(dir).name if sub else Path(dir).resolve().as_posix(),
+        "type": "dir",
+        "content": content
+    }
 
-    except Exception as e:
-        print(f"解析CUE出错: {e}")
+def simplify_scan_result(scan):
+    if scan['type'] == 'album':
+        return scan
+    simplified = list(filter(lambda x: x, [simplify_scan_result(i) for i in scan['content']]))
+    if not simplified:
+        return None
+    if len(simplified) == 1 and simplified[0]['type'] == 'dir':
+        return simplified[0] | {
+            'name': f"{scan['name']}/{simplified[0]['name']}"
+        }
+    return scan | {
+        "content": list(sorted(simplified, key=lambda x: (x['type'] == 'album', x['name'])))
+    }
 
-    return audio_file, tracks, album_title, album_artist
 
 # ---------- 扫描多个目录 ----------
 def scan_directories(dir_list):
-    global CUE_TRACKS_CACHE
-    song_map = defaultdict(lambda: {
-        "norm_title": "",
-        "original_titles": set(),
-        "performers": set(),
-        "cueFiles": set(),
-        "audioFiles": set(),
-        "trackIndexes": [],
-        "cueCoverMap": {},
-        "cueAlbumMap": {},
-        "cueArtistMap": {},
-        "cueTrackPerformerMap": {},
-        "cueTrackTitleMap": {}
-    })
+    return [simplify_scan_result(scan_dir(dir)) for dir in dir_list]
 
-    for root_dir in dir_list:
-        if not os.path.isdir(root_dir):
-            continue
-        for dirpath, _, filenames in os.walk(root_dir):
-            for f in filenames:
-                if f.lower().endswith('.cue'):
-                    full = os.path.join(dirpath, f)
-                    cover_path = find_cover_image(dirpath, f)
-                    try:
-                        with open(full, 'r', encoding='utf-8-sig', errors='ignore') as fp:
-                            content = fp.read()
-                        audio_file, tracks, album_title, album_artist = parse_cue_with_times(content, dirpath)
-                        if tracks:
-                            CUE_TRACKS_CACHE[full] = {
-                                'audio_file': audio_file,
-                                'tracks': tracks,
-                                'album': album_title or '',
-                                'artist': album_artist or '',
-                                'cover': cover_path
-                            }
-                            album_title = album_title or ''
-                            album_artist = album_artist or ''
-                            for idx, track in enumerate(tracks):
-                                raw_title = track.get('title')
-                                if not raw_title:
-                                    continue
-                                norm = normalize_title(raw_title)
-                                info = song_map[norm]
-                                info["norm_title"] = norm
-                                info["original_titles"].add(raw_title)
-                                performer = track.get('performer') or album_artist
-                                if performer:
-                                    info["performers"].add(performer)
-                                info["cueFiles"].add(full)
-                                if audio_file and os.path.exists(audio_file):
-                                    info["audioFiles"].add(audio_file)
-                                info["trackIndexes"].append((full, idx))
-                                info["cueCoverMap"][full] = cover_path
-                                info["cueAlbumMap"][full] = album_title
-                                info["cueArtistMap"][full] = album_artist
-                                info["cueTrackPerformerMap"][full] = performer or ''
-                                info["cueTrackTitleMap"][full] = raw_title
-                    except Exception as e:
-                        print(f"处理CUE {full} 出错: {e}")
-
-    songs = []
-    for norm, info in song_map.items():
-        audio_list = [af for af in info["audioFiles"] if os.path.exists(af)]
-        audio_path = audio_list[0] if audio_list else None
-        track_ref = info["trackIndexes"][0] if info["trackIndexes"] else (None, 0)
-        cover = next((c for c in info["cueCoverMap"].values() if c), None)
-        songs.append({
-            "id": norm,
-            "original_titles": list(info["original_titles"]),
-            "performers": list(info["performers"]),
-            "cueFiles": list(info["cueFiles"]),
-            "cueTrackMap": {cue: idx for cue, idx in info["trackIndexes"]},
-            "cueCoverMap": info["cueCoverMap"],
-            "cueAlbumMap": info["cueAlbumMap"],
-            "cueArtistMap": info["cueArtistMap"],
-            "cueTrackPerformerMap": info["cueTrackPerformerMap"],
-            "cueTrackTitleMap": info["cueTrackTitleMap"],
-            "audioFile": audio_path,
-            "cueRef": track_ref[0],
-            "trackIndex": track_ref[1],
-            "cover": cover,
-            "path": list(info["cueFiles"])[0]
-        })
-    songs.sort(key=lambda x: x["id"])
-    return {"songs": songs, "cueCount": len(CUE_TRACKS_CACHE)}
+'''
+# For frontpage debug use only, do NOT use in the production.
+try:
+    DEBUG_CACHE = __import__('pickle').load(open('.debug-cache.pkl', 'rb'))
+except:
+    DEBUG_CACHE = {}
+def scan_directories(dir_list):
+    key = tuple(sorted(Path(dir).resolve().as_posix() for dir in dir_list))
+    if key in DEBUG_CACHE:
+        return DEBUG_CACHE[key]
+    DEBUG_CACHE[key] = [simplify_scan_result(scan_dir(dir)) for dir in dir_list]
+    __import__('pickle').dump(DEBUG_CACHE, open('.debug-cache.pkl', 'wb'))
+    return DEBUG_CACHE[key]
+'''
 
 from ortools.sat.python import cp_model
 from collections import defaultdict
@@ -422,37 +396,123 @@ def compute_schemes(songs, selected_titles, K=20, w_c=10, w_m=5, w_e=1, time_lim
     return schemes[:K]
 
 # ---------- 导出辅助函数 ----------
-def get_cached_segment(audio_file, start, end, title, performer, album, cover):
-    """生成音频片段并返回缓存文件路径"""
-    meta_str = f"{title}_{performer}_{album}_{cover if cover else ''}"
-    key = hashlib.md5(f"{audio_file}_{start}_{end}_{meta_str}".encode()).hexdigest()
+def extract_cover(audio):
+    key = hashlib.md5(Path(audio).resolve().as_posix().encode()).hexdigest()
+    if cached := glob.glob(os.path.join(CACHE_DIR, f'{key}.*')):
+        return cached[0]
+    
+    try:
+        cmd = ['ffprobe', '-v', 'error', '-select_streams', 'v:0',
+                '-show_entries', 'stream=codec_name',
+                '-of', 'default=noprint_wrappers=1:nokey=1', audio]
+        result = subprocess.run(cmd, capture_output=True, text=True, timeout=10)
+        if result.returncode == 0 and result.stdout.strip():
+            codec = result.stdout.strip()
+        else:
+            return None
+    except:
+        return None
+
+    ext = {
+        'mjpeg': '.jpg',
+        'jpeg': '.jpg',
+        'png': '.png',
+        'gif': '.gif',
+        'bmp': '.bmp',
+        'webp': '.webp'
+    }.get(codec, '.jpg')
+
+    extract_cmd = [
+        'ffmpeg', '-i', audio, '-an', '-c:v', 'copy', outpath:=os.path.join(CACHE_DIR, key+ext)
+    ]
+    result = subprocess.run(extract_cmd, capture_output=True, timeout=10)
+    if result.returncode == 0:
+        return outpath
+
+def export_song(output, format, file, start=None, end=None, extra=None):
+    print(output, format, file, start, end, extra)
+    if not extra:
+        extra = {}
+    target = os.path.splitext(file)[1].lower().lstrip('.') if format == 'keep' else format
+    print(1)
+    codec_map = {
+        'mp3':  {'codec': 'libmp3lame', 'bitrate': '192k', 'ext': 'mp3', 'extra_args': []},
+        'flac': {'codec': 'flac',       'bitrate': None,  'ext': 'flac', 'extra_args': []},
+        'aac':  {'codec': 'aac',        'bitrate': '192k', 'ext': 'm4a', 'extra_args': ['-movflags', '+faststart']},
+        'ogg':  {'codec': 'libvorbis',  'bitrate': '192k', 'ext': 'ogg', 'extra_args': []},
+        'opus': {'codec': 'libopus',    'bitrate': '128k', 'ext': 'opus', 'extra_args': []},
+        'wav':  {'codec': 'pcm_s16le',  'bitrate': None,  'ext': 'wav', 'extra_args': []},
+    }
+    fmt_info = codec_map[target]
+    print(2)
+
+    cmd = ['ffmpeg']
+
+    if start:
+        cmd += ['-ss', str(start)]
+    if end:
+        cmd += ['-to', str(end)]
+    cmd += ['-i', file]
+    print(3)
+
+    has_cover = False
+    if extra.get('cover') and target in ['mp3', 'flac', 'aac']:
+        has_cover = True
+        if any(extra['cover'].endswith(ext) for ext in ['mp3', 'flac', 'm4a']):
+            extra['cover'] = extract_cover(file)
+        cmd += [
+            '-i', extra['cover'],
+            '-map', '0:a',
+            '-map', '1',
+            '-disposition:v:0', 'attached_pic'
+        ]
+    else:
+        cmd += ['-map', '0:a']
+    print(4)
+
+    cmd += ['-map_metadata', '-1']
+    if format != 'keep':
+        cmd += ['-acodec', fmt_info['codec']]
+        if fmt_info['bitrate']:
+            cmd += ['-b:a', fmt_info['bitrate']]
+        if fmt_info['extra_args']:
+            cmd += fmt_info['extra_args']
+    else:
+        cmd += ['-c:a', 'copy']
+    print(5)
+
+    if fmt_info['codec'] == 'libmp3lame':
+        cmd += ['-id3v2_version', '3']
+    if has_cover:
+        cmd += ['-metadata:s:v', 'title=Album cover']
+        cmd += ['-metadata:s:v', 'comment=Cover (front)']
+
+    if 'title' in extra:
+        cmd.extend(['-metadata', f'title={extra["title"]}'])
+    if 'artist' in extra:
+        cmd.extend(['-metadata', f'artist={extra["artist"]}'])
+    if 'album' in extra:
+        cmd.extend(['-metadata', f'album={extra["album"]}'])
+    if 'album_artist' in extra:
+        cmd.extend(['-metadata', f'album_artist={extra["album_artist"]}'])
+    print(6)
+
+    cmd += ['-y', output]
+
+    print(cmd)
+
+    subprocess.run(cmd, capture_output=True, check=True, text=True, encoding='utf-8', timeout=120)
+    print(7)
+
+def get_cached_segment(audio_file, start = None, end = None, extra = None):
+    """生成音频片段并返回缓存文件路径，支持 album_artist 元数据"""
+    if not extra:
+        extra = {}
+    key = hashlib.md5(f"{Path(audio_file).resolve().as_posix()}_{start or 'start'}_{end or 'end'}".encode()).hexdigest()
     cache_file = os.path.join(CACHE_DIR, f"{key}.mp3")
 
     if not os.path.exists(cache_file):
-        cmd = ['ffmpeg', '-ss', str(start), '-to', str(end), '-i', audio_file]
-        if cover and os.path.exists(cover):
-            cmd.extend(['-i', cover])
-            cmd.extend(['-map', '0:a', '-map', '1'])
-            cmd.extend(['-c:v', 'copy'])
-            cmd.extend(['-id3v2_version', '3'])
-            cmd.extend(['-metadata:s:v', 'title="Album cover"'])
-            cmd.extend(['-metadata:s:v', 'comment="Cover (front)"'])
-        else:
-            cmd.extend(['-map', '0:a'])
-        cmd.extend(['-acodec', 'libmp3lame', '-ab', '192k'])
-        if title:
-            cmd.extend(['-metadata', f'title={title}'])
-        if performer:
-            cmd.extend(['-metadata', f'artist={performer}'])
-        if album:
-            cmd.extend(['-metadata', f'album={album}'])
-        cmd.extend(['-y', cache_file])
-        try:
-            subprocess.run(cmd, capture_output=True, check=True, timeout=60)
-        except subprocess.CalledProcessError as e:
-            raise Exception(f"FFmpeg处理失败: {e.stderr.decode()}")
-        except FileNotFoundError:
-            raise Exception("FFmpeg未安装，请安装FFmpeg")
+        export_song(cache_file, 'mp3', audio_file, start, end, extra)
     return cache_file
 
 def generate_unique_filename(target_dir, base_filename, ext, duplicate_mode):
@@ -476,150 +536,45 @@ def generate_unique_filename(target_dir, base_filename, ext, duplicate_mode):
     else:
         return final_path, 'overwrite'  # fallback
 
-def export_selected_songs(songs, target_dir, format, template, duplicate_mode):
+def export_selected_songs(target_dir, commands, ext, template, duplicate_mode):
     """
     导出选中的歌曲列表，生成器用于流式输出进度
+    songs: 列表，每个元素包含基本字段，且必须包含 'selectedCue' 和 'selectedIndex'（若缺省则使用默认）
+    meta_data: 已有的元数据字典（用于更新）
     """
-    total = len(songs)
+    print(target_dir, commands, ext, template, duplicate_mode)
+    total = len(commands)
     success_count = 0
     skip_count = 0
     error_count = 0
 
     os.makedirs(target_dir, exist_ok=True)
 
-    # 格式对应的编码参数
-    codec_map = {
-        'mp3':  {'codec': 'libmp3lame', 'bitrate': '192k', 'ext': 'mp3', 'extra_args': []},
-        'flac': {'codec': 'flac',       'bitrate': None,  'ext': 'flac', 'extra_args': []},
-        'aac':  {'codec': 'aac',        'bitrate': '192k', 'ext': 'm4a', 'extra_args': ['-movflags', '+faststart']},
-        'ogg':  {'codec': 'libvorbis',  'bitrate': '192k', 'ext': 'ogg', 'extra_args': []},
-        'opus': {'codec': 'libopus',    'bitrate': '128k', 'ext': 'opus', 'extra_args': []},
-        'wav':  {'codec': 'pcm_s16le',  'bitrate': None,  'ext': 'wav', 'extra_args': []},
-    }
-    if format not in codec_map:
-        raise ValueError(f'不支持的格式: {format}')
-    fmt_info = codec_map[format]
-    ext = fmt_info['ext']
+    for idx, song in enumerate(commands):
+        filename_template = template
+        filename = filename_template.replace('{title}', song['extra'].get('title', '未知标题'))\
+                                    .replace('{artist}', song['extra'].get('artist', '未知演奏者'))\
+                                    .replace('{album}', song['extra'].get('album', '未知专辑'))\
+                                    .replace('{track}', str(song['extra'].get('index', '')))\
+                                    .replace('{ext}', os.path.splitext(song['file'])[1] if ext == 'keep' else ext)
+        illegal_chars = r'[\\/:*?"<>|]'
+        filename = re.sub(illegal_chars, '_', filename)
 
-    for idx, song in enumerate(songs):
-        song_id = song.get('id')
-        title = song.get('original_titles', [''])[0] or '未命名'
-        cue_path = song.get('cueRef') or (song.get('cueFiles', [])[0] if song.get('cueFiles') else None)
-        if not cue_path:
-            error_count += 1
-            yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': title, 'status': 'error', 'msg': '缺少CUE文件'}
+        final_path, action = generate_unique_filename(target_dir, filename, os.path.splitext(song['file'])[1] if ext == 'keep' else ext, duplicate_mode)
+        if action == 'skip':
+            skip_count += 1
+            yield {'event': 'progress', 'current': idx+1, 'total': total, 'title': song['extra'].get('title', '未知标题'), 'status': 'skipped', 'msg': '文件已存在，已跳过'}
             continue
-
-        track_index = song.get('trackIndex')
-        if track_index is None:
-            track_index = song.get('cueTrackMap', {}).get(cue_path)
-        if track_index is None:
-            error_count += 1
-            yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': title, 'status': 'error', 'msg': '缺少track索引'}
-            continue
-
-        album = song.get('cueAlbumMap', {}).get(cue_path, '')
-        artist = song.get('cueTrackPerformerMap', {}).get(cue_path, '') or (song.get('performers', [''])[0] if song.get('performers') else '')
-        cover = song.get('cueCoverMap', {}).get(cue_path, '')
-        raw_title = song.get('cueTrackTitleMap', {}).get(cue_path, title)
-
-        # 获取音频文件及轨道信息
         try:
-            cache_info = CUE_TRACKS_CACHE.get(cue_path)
-            if not cache_info:
-                with open(cue_path, 'r', encoding='utf-8-sig', errors='ignore') as f:
-                    content = f.read()
-                audio_file, tracks, album_title, album_artist = parse_cue_with_times(content, os.path.dirname(cue_path))
-                cover_path = find_cover_image(os.path.dirname(cue_path), os.path.basename(cue_path))
-                cache_info = {
-                    'audio_file': audio_file,
-                    'tracks': tracks,
-                    'album': album_title or '',
-                    'artist': album_artist or '',
-                    'cover': cover_path
-                }
-                CUE_TRACKS_CACHE[cue_path] = cache_info
-
-            audio_file = cache_info.get('audio_file')
-            tracks = cache_info.get('tracks')
-            if not audio_file or not os.path.exists(audio_file):
-                error_count += 1
-                yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': title, 'status': 'error', 'msg': f'音频文件不存在: {audio_file}'}
-                continue
-            if track_index >= len(tracks):
-                error_count += 1
-                yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': title, 'status': 'error', 'msg': f'曲目索引超出范围: {track_index}'}
-                continue
-            track = tracks[track_index]
-            start = track['start']
-            end = track['end']
-            duration = end - start
-            if duration <= 0:
-                duration = 60
-
-            # 构建输出文件名
-            filename_template = template
-            filename = filename_template.replace('{title}', raw_title)\
-                                         .replace('{artist}', artist)\
-                                         .replace('{album}', album)\
-                                         .replace('{track}', str(track_index+1))\
-                                         .replace('{ext}', ext)
-            illegal_chars = r'[\\/:*?"<>|]'
-            filename = re.sub(illegal_chars, '_', filename)
-
-            final_path, action = generate_unique_filename(target_dir, filename, ext, duplicate_mode)
-            if action == 'skip':
-                skip_count += 1
-                yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': raw_title, 'status': 'skipped', 'msg': '文件已存在，已跳过'}
-                continue
-
-            # ---------- 构建 ffmpeg 命令 ----------
-            cmd = ['ffmpeg', '-ss', str(start), '-to', str(end), '-i', audio_file]
-
-            # 判断是否支持内嵌封面（作为视频流）—— OGG/Opus/WAV 不支持
-            cover_supported = ext not in ['ogg', 'opus', 'wav']
-            if cover and os.path.exists(cover) and cover_supported:
-                cmd.extend(['-i', cover])
-                cmd.extend(['-map', '0:a', '-map', '1'])
-                cmd.extend(['-c:v', 'copy'])
-                cmd.extend(['-disposition:v:0', 'attached_pic'])
-            else:
-                cmd.extend(['-map', '0:a'])
-
-            # 清除所有输入元数据，避免复制 CUE 表等无关信息
-            cmd.extend(['-map_metadata', '-1'])
-
-            # 音频编码
-            cmd.extend(['-acodec', fmt_info['codec']])
-            if fmt_info['bitrate']:
-                cmd.extend(['-b:a', fmt_info['bitrate']])
-            if fmt_info['extra_args']:
-                cmd.extend(fmt_info['extra_args'])
-
-            # 如果是 MP3，添加 ID3v2 版本支持（有利于封面显示）
-            if fmt_info['codec'] == 'libmp3lame':
-                cmd.extend(['-id3v2_version', '3'])
-
-            # 手动设置元数据
-            if raw_title:
-                cmd.extend(['-metadata', f'title={raw_title}'])
-            if artist:
-                cmd.extend(['-metadata', f'artist={artist}'])
-            if album:
-                cmd.extend(['-metadata', f'album={album}'])
-
-            cmd.extend(['-y', final_path])
-
-            subprocess.run(cmd, capture_output=True, check=True, timeout=120)
-            success_count += 1
-            yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': raw_title, 'status': 'success' if action == 'new' else action, 'path': final_path}
+            export_song(final_path, ext, **song)
+            yield {'event': 'progress', 'current': idx+1, 'total': total, 'title': song['extra'].get('title', '未知标题'), 'status': 'success' if action == 'new' else action, 'path': final_path}
 
         except subprocess.CalledProcessError as e:
             error_count += 1
-            yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': raw_title, 'status': 'error', 'msg': f'FFmpeg错误: {e.stderr.decode()}'}
+            yield {'event': 'progress', 'current': idx+1, 'total': total, 'title': song['extra'].get('title', '未知标题'), 'status': 'error', 'msg': f'FFmpeg错误: {e.stderr.decode()}'}
         except Exception as e:
             error_count += 1
-            yield {'event': 'progress', 'current': idx+1, 'total': total, 'songId': song_id, 'title': raw_title, 'status': 'error', 'msg': str(e)}
+            yield {'event': 'progress', 'current': idx+1, 'total': total, 'title': song['extra'].get('title', '未知标题'), 'status': 'error', 'msg': str(e)}
 
     yield {'event': 'complete', 'total': total, 'success': success_count, 'skipped': skip_count, 'errors': error_count}
 
@@ -636,12 +591,14 @@ def api_scan():
         return jsonify({"success": False, "error": "目录列表为空"})
     try:
         result = scan_directories(dirs)
-        return jsonify({"success": True, **result})
+        return jsonify({"success": True, "result": result})
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
-@app.route('/api/browse', methods=['GET'])
-def api_browse():
+@app.route('/api/browse_dir', methods=['GET'])
+def api_browse_dir():
+    initial = request.args.get('initial')
+    title = request.args.get('title', "选择目录")
     try:
         root = tk.Tk()
         root.withdraw()
@@ -650,10 +607,31 @@ def api_browse():
         except:
             pass
         root.attributes('-topmost', True)
-        folder_path = filedialog.askdirectory(title="选择目录")
+        folder_path = filedialog.askdirectory(title=title, initialdir=initial)
         root.destroy()
         if folder_path:
             return jsonify({"success": True, "path": folder_path})
+        else:
+            return jsonify({"success": False, "error": "未选择任何目录"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
+
+@app.route('/api/browse_file', methods=['GET'])
+def api_browse_file():
+    initial = request.args.get('initial')
+    title = request.args.get('title', "选择文件")
+    try:
+        root = tk.Tk()
+        root.withdraw()
+        try:
+            root.tk.call('tk', 'scaling', 1.5)
+        except:
+            pass
+        root.attributes('-topmost', True)
+        file_path = filedialog.askopenfile(title=title, initialdir=initial)
+        root.destroy()
+        if file_path:
+            return jsonify({"success": True, "path": file_path})
         else:
             return jsonify({"success": False, "error": "未选择任何目录"})
     except Exception as e:
@@ -682,58 +660,14 @@ def api_compute():
 
 @app.route('/api/audio_segment')
 def audio_segment():
-    cue_path = request.args.get('cue')
-    try:
-        track_index = int(request.args.get('index', 0))
-    except:
-        abort(400, "缺少有效的 index 参数")
-
-    if not cue_path or not os.path.exists(cue_path):
-        abort(400, "CUE 文件不存在")
-
-    cache = CUE_TRACKS_CACHE.get(cue_path)
-    if not cache:
-        try:
-            with open(cue_path, 'r', encoding='utf-8-sig', errors='ignore') as f:
-                content = f.read()
-            audio_file, tracks, album_title, album_artist = parse_cue_with_times(content, os.path.dirname(cue_path))
-            cover_path = find_cover_image(os.path.dirname(cue_path), os.path.basename(cue_path))
-            cache = {
-                'audio_file': audio_file,
-                'tracks': tracks,
-                'album': album_title or '',
-                'artist': album_artist or '',
-                'cover': cover_path
-            }
-            CUE_TRACKS_CACHE[cue_path] = cache
-        except Exception as e:
-            abort(500, f"无法解析CUE文件: {str(e)}")
-
-    if track_index >= len(cache['tracks']):
-        abort(404, "曲目索引超出范围")
-
-    track = cache['tracks'][track_index]
-    audio_file = cache['audio_file']
-    if not audio_file or not os.path.exists(audio_file):
-        abort(404, "音频文件不存在")
-
-    start = track['start']
-    end = track['end']
-    duration = end - start
-    if duration <= 0:
-        duration = 60
-
-    album = cache.get('album', '')
-    artist = cache.get('artist', '')
-    cover = cache.get('cover')
-    title = track.get('title', '')
-    performer = track.get('performer') or artist
-
-    try:
-        cached_file = get_cached_segment(audio_file, start, end, title, performer, album, cover)
-        return send_file(cached_file, as_attachment=False, conditional=True, mimetype='audio/mpeg')
-    except Exception as e:
-        abort(500, str(e))
+    file = request.args.get('file')
+    start = request.args.get('start')
+    end = request.args.get('end')
+    extra = json.loads(request.args.get('extra', '{}'))
+    if not any(file.endswith(ext) for ext in AUDIO_EXT):
+        abort(400)
+    path = get_cached_segment(file, start, end, extra)
+    return send_file(path, conditional=True)
 
 @app.route('/api/cover')
 def cover_image():
@@ -741,30 +675,36 @@ def cover_image():
     if not path or not os.path.exists(path):
         abort(404)
     ext = os.path.splitext(path)[1].lower()
-    if ext not in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']:
+    if ext in ['.mp3', '.flac', '.m4a']:
+        path = extract_cover(path)
+        return send_file(path, conditional=True)
+    elif ext not in ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp']:
         abort(400)
     return send_file(path, conditional=True)
 
 import platform
 import subprocess
 
-@app.route('/api/open_file', methods=['POST'])
+@app.route('/api/open_explorer', methods=['POST'])
 def api_open_file():
     """在文件管理器中打开并选中指定文件"""
     data = request.get_json()
     filepath = data.get('path', '')
+    select = data.get('select', True)
     if not filepath or not os.path.exists(filepath):
         return jsonify({"success": False, "error": "文件不存在"})
     try:
         system = platform.system()
         if system == 'Windows':
-            subprocess.Popen(['explorer', '/select,', os.path.normpath(filepath)])
+            subprocess.Popen(['explorer', '/select,', os.path.normpath(filepath)]
+                             if select else ['explorer', os.path.normpath(filepath)])
         elif system == 'Darwin':  # macOS
-            subprocess.Popen(['open', '-R', filepath])
+            subprocess.Popen(['open', '-R', filepath]
+                             if select else ['open', filepath])
         else:  # Linux
-            for cmd in [['nautilus', '--select'], ['dolphin', '--select'], ['thunar', '--select']]:
+            for cmd in ['nautilus', 'dolphin', 'thunar']:
                 try:
-                    subprocess.Popen(cmd + [filepath])
+                    subprocess.Popen([cmd] + (['--select'] if select else []) + [filepath])
                     break
                 except FileNotFoundError:
                     continue
@@ -776,15 +716,14 @@ def api_open_file():
 
 @app.route('/api/export', methods=['POST'])
 def api_export():
-    """导出选中的歌曲，返回SSE流"""
     data = request.get_json()
-    songs = data.get('songs', [])
+    commands = data.get('commands', [])
     target_dir = data.get('targetDir', '')
-    format = data.get('format', 'mp3')
+    format = data.get('format', 'keep')
     template = data.get('template', '{title} - {artist}')
     duplicate = data.get('duplicate', 'rename')
 
-    if not songs:
+    if not commands:
         return jsonify({"success": False, "error": "没有要导出的歌曲"}), 400
     if not target_dir:
         return jsonify({"success": False, "error": "未指定保存目录"}), 400
@@ -795,10 +734,10 @@ def api_export():
             return jsonify({"success": False, "error": f"无法创建目录: {str(e)}"}), 400
 
     def generate():
-        for event_data in export_selected_songs(songs, target_dir, format, template, duplicate):
+        for event_data in export_selected_songs(target_dir, commands, format, template, duplicate):
             yield f"data: {json.dumps(event_data)}\n\n"
 
     return Response(stream_with_context(generate()), mimetype='text/event-stream')
-
+    
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5050)
+    app.run(debug=True, host='127.0.0.1', port=5050)

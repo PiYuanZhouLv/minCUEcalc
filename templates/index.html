@@ -31,6 +31,9 @@
         .btn-warning:hover { background: #d97706; }
         .btn-danger { background: #ef4444; color: #fff; }
         .btn-danger:hover { background: #dc2626; }
+        .btn-favourite { border: none; -webkit-text-stroke: 2px; color: #757575; cursor:pointer; }
+        .btn-favourite:hover { opacity: 0.7; }
+        .btn-favourite.checked { color: #D48C00; }
         .dir-manager { background: #fafbfc; border: 1px solid #e9edf2; border-radius: 12px; padding: 16px; margin: 8px 0 16px; }
         .dir-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
         .dir-tag { background: #eef2f6; padding: 4px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
@@ -44,7 +47,7 @@
         .selected-item:hover { background: #bfdbfe; }
         .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 10px 0; }
         .search-box { position: relative; flex: 1; max-width: 300px; }
-        .search-box input { padding-left: 36px; }
+        .search-box input { padding-left: 36px; min-width: 150px; }
         .search-box .icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
         .song-list { border: 1px solid #e9edf2; border-radius: 12px; background: #fafbfc; max-height: 400px; overflow-y: auto; }
         .list-header { display: flex; align-items: center; padding: 8px 16px; background: #f1f4f9; border-bottom: 1px solid #e9edf2; font-weight: 500; }
@@ -65,6 +68,10 @@
         .song-item .sources .cue-path .performer-tag { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; color: #475569; }
         .song-item .sources .cue-path .play-btn { flex: 0 0 auto; background: none; border: none; cursor: pointer; color: #3b82f6; font-size: 14px; padding: 0 2px; line-height: 1; }
         .song-item .sources .cue-path .play-btn:hover { color: #2563eb; }
+        .song-item .sources .cue-path .playlater-btn { flex: 0 0 auto; background: none; border: none; cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
+        .song-item .sources .cue-path .playlater-btn:hover { opacity: 0.7; }
+        .song-item .sources .cue-path .remove-btn { flex: 0 0 auto; background: none; border: none; cursor: pointer; font-size: 14px; padding: 0 2px; line-height: 1; }
+        .song-item .sources .cue-path .remove-btn:hover { opacity: 0.7; }
         .song-item .sources .cue-path .download-btn { flex: 0 0 auto; background: none; border: none; cursor: pointer; color: #10b981; font-size: 14px; padding: 0 2px; line-height: 1; }
         .song-item .sources .cue-path .download-btn:hover { color: #059669; }
         .result-area { margin-top: 20px; border: 1px solid #e9edf2; border-radius: 12px; background: #fafbfc; padding: 20px; display: none; }
@@ -88,9 +95,9 @@
         /* 迷你播放器 */
         #miniPlayer { display:none; position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:#fff; padding:12px 20px; box-shadow:0 -2px 10px rgba(0,0,0,0.3); z-index:1000; font-family: -apple-system, sans-serif; }
         #miniPlayer .player-inner { display:flex; align-items:center; gap:16px; flex-wrap:wrap; max-width:1300px; margin:0 auto; }
-        #miniPlayer .player-cover { width:48px; height:48px; object-fit:cover; border-radius:4px; flex-shrink:0; background:#475569; cursor:pointer; }
-        #miniPlayer .player-info { flex:1; min-width:100px; display:flex; flex-direction:column; overflow:hidden; }
-        #miniPlayer .player-title { font-weight:500; white-space:nowrap; overflow:hidden; position:relative; cursor:default; scrollbar-width:none; -ms-overflow-style:none; }
+        #miniPlayer .player-cover { width:48px; height:48px; object-fit:cover; border-radius:4px; flex-shrink:0; background:#475569; }
+        #miniPlayer .player-info { flex:2; min-width:200px; display:flex; flex-direction:column; overflow:hidden; }
+        #miniPlayer .player-title { font-weight:500; white-space:nowrap; overflow:hidden; position:relative; cursor:default; scrollbar-width:none; -ms-overflow-style:none; cursor:pointer; }
         #miniPlayer .player-title::-webkit-scrollbar { display:none; }
         #miniPlayer .player-title .scroll-text { display:inline-block; white-space:nowrap; }
         #miniPlayer .player-artist { font-size:12px; color:#94a3b8; white-space:nowrap; overflow:hidden; position:relative; cursor:default; scrollbar-width:none; -ms-overflow-style:none; }
@@ -98,10 +105,11 @@
         #miniPlayer .player-artist::-webkit-scrollbar, #miniPlayer .player-album::-webkit-scrollbar, #miniPlayer .player-title::-webkit-scrollbar { display:none; }
         #miniPlayer .player-artist .scroll-text, #miniPlayer .player-album .scroll-text, #miniPlayer .player-title .scroll-text { display:inline-block; white-space:nowrap; }
         #miniPlayer .player-btn { background:none; border:none; color:#fff; font-size:24px; cursor:pointer; padding:0 8px; }
-        #miniPlayer .player-btn:hover { color:#94a3b8; }
-        #miniPlayer .player-progress-area { flex:3; min-width:150px; display:flex; align-items:center; gap:10px; }
-        #miniPlayer .player-progress-area input[type="range"] { flex:1; height:4px; appearance:none; background:#475569; border-radius:2px; outline:none; }
-        #miniPlayer .player-progress-area input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#3b82f6; cursor:pointer; }
+        #miniPlayer .player-btn:hover { opacity: 0.7; }
+        #miniPlayer .player-progress-area { flex:3 0 auto; min-width:150px; display:flex; align-items:center; gap:10px; }
+        #miniPlayer .player-volume-area { display: flex; align-items: center; gap: 5px; }
+        #miniPlayer input[type="range"] { flex:1; height:4px; appearance:none; background:#475569; border-radius:2px; outline:none; }
+        #miniPlayer input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:12px; height:12px; border-radius:50%; background:#3b82f6; cursor:pointer; }
         #miniPlayer .player-time { font-size:13px; min-width:40px; }
         #miniPlayer .player-status { font-size:13px; color:#94a3b8; }
         @media (max-width:600px) { #miniPlayer .player-inner { gap:8px; } #miniPlayer .player-info { min-width:60px; } #miniPlayer .player-cover { width:36px; height:36px; } }
@@ -117,11 +125,12 @@
         #splitModal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
         #splitModal .modal-content { background: #fff; border-radius: 12px; padding: 24px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
         #splitModal .modal-content h3 { margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-        #splitModal .modal-content .source-list { list-style: none; padding: 0; }
-        #splitModal .modal-content .source-list li { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid #e9edf2; font-size: 13px; }
+        #splitModal .modal-content .source-list { list-style: none; padding: 0; border: 1px solid lightgray;}
+        #splitModal .modal-content .source-list li { display: flex; align-items: center; gap: 8px; padding: 6px 4px; border-bottom: 1px solid #e9edf2; font-size: 13px; flex-wrap: wrap;}
         #splitModal .modal-content .source-list li input[type="checkbox"] { flex-shrink: 0; }
-        #splitModal .modal-content .source-list li .cue-info { flex: 1; word-break: break-all; }
-        #splitModal .modal-content .source-list li .perf-info { color: #475569; font-weight: 500; }
+        #splitModal .modal-content .source-list li .cue-info { flex: 0 1 auto; word-break: break-all; }
+        #splitModal .modal-content .source-list li .perf-info { flex: 1; color: #475569; font-weight: 500; }
+        #splitModal .modal-content .source-list li:nth-child(2n) { background-color: #daeaff; }
         #splitModal .modal-footer { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
 
         /* 导出模态框 */
@@ -168,6 +177,53 @@
             opacity: 0.7;
         }
         .toast .toast-close:hover { opacity: 1; }
+
+        #playlistPage {
+            position: fixed;
+            z-index: 99999;
+            top: 0;
+            bottom: 0;
+            max-width: 400px;
+            right: -100%;
+            max-width: min(600px, 100vw);
+            min-width: max(200px, 30vw);
+            background-color: white;
+            border-left: 1px solid;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        #playlistPage > :nth-child(1) {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        #playlistPage > :nth-child(1) > button {
+            border: none;
+        }
+
+        #playlistPage > :nth-child(1) > :nth-child(2) {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        #playlistPage .song-item {
+            padding: 0;
+        }
+
+        #playlistPage .title {
+            cursor: pointer;
+        }
+
+        #playlistDiv {
+            overflow: auto;
+        }
+
+        .playing, .playing * {
+            background-color: #dbeafe !important;
+        }
     </style>
 </head>
 <body>
@@ -204,13 +260,12 @@
                     <span class="count-badge" id="countDisplay">共 <strong>0</strong> 首</span>
                     <button class="btn btn-outline" id="selectAllBtn">✅ 全选</button>
                     <button class="btn btn-outline" id="deselectAllBtn">⬜ 取消全选</button>
+                    <button class="btn btn-outline" id="playAllBtn">🎤 全部播放</button>
+                    <button class="btn btn-outline" id="playlaterAllBtn">➕ 全部加入播放列表</button>
                 </div>
                 <div class="song-list" id="songListContainer">
-                    <div class="list-header">
-                        <label><input type="checkbox" id="headerCheckbox" /> 全选</label>
-                        <span style="margin-left:auto;font-size:12px;color:#94a3b8;">点击行切换 · ▶ 预览</span>
-                    </div>
                     <div id="songList"><div class="empty-msg">📂 请添加目录并扫描</div></div>
+                    <div id="resizeTip" style="display: none; height: 200px; font-size: 27px; justify-content: center; align-items: center;">⛔ 窗口大小改变，临时屏蔽</div>
                 </div>
                 <div style="margin-top:10px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
                     <span style="font-size:13px;color:#475569;">方案数量 K：</span>
@@ -262,6 +317,11 @@
             </div>
             <span class="player-status" id="playerStatus">就绪</span>
             <button class="player-btn" id="playerDownloadBtn" title="下载当前歌曲">⬇</button>
+            <div class="player-volume-area">
+                <input type="range" id="playerVolumeRange" min="0" max="100" value="100" />
+                <span class="player-time" id="playerVolume">100%</span>
+            </div>
+            <button class="player-btn" id="playerOpenPlaylist" title="打开播放列表">📼</button>
         </div>
     </div>
 
@@ -306,6 +366,7 @@
                 </div>
                 <label>文件格式</label>
                 <select id="exportFormat">
+                    <option value="keep">保留原格式</option>
                     <option value="mp3">MP3</option>
                     <option value="flac">FLAC</option>
                     <option value="aac">AAC (M4A)</option>
@@ -337,6 +398,15 @@
     <!-- Toast 容器 -->
     <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:99999; display:flex; flex-direction:column; gap:8px; max-width:360px; width:100%; pointer-events:none;"></div>
 
+    <div id="playlistPage">
+        <div>
+            <button id="closePlaylist" title="关闭播放列表">❌</button>
+            <span>播放列表</span>
+        </div>
+        <div id="playlistDiv"></div>
+        <div id="resizeTip2" style="display: none; height: 200px; font-size: 27px; justify-content: center; align-items: center;">⛔ 窗口大小改变，临时屏蔽</div>
+    </div>
+
     <script>
         // ========================== 完整前端逻辑 ==========================
         const $ = s => document.querySelector(s);
@@ -344,25 +414,26 @@
 
         const state = {
             dirs: [],
-            songs: [],
-            displaySongs: [],
-            splitMap: {},
+            albumTrees: [],
+            normSongs: [],
+            origNorm: [],
+            indexToNorm: {},
+            normDiff: [],
+            favour: {},
             selected: new Set(),
             searching: '',
             results: null,
-            _pendingSelected: null,
-            initialized: false,
-            _pendingSplitParentId: null,
             playMode: 'single',
             playlist: [],
+            playlistOrdered: [],
             playIndex: -1,
         };
+        let merging = null;
+        let mousedownDetail = null;
         let currentSongId = null;
         let currentAudio = null;
         let audioController = null;
-        let isAdvancing = false;
-        let currentSongTitle = '';
-        let currentCoverData = { path: '', name: '', format: '', width: 0, height: 0 };
+        let switchingSongIndicator = 0;
 
         // DOM 引用
         const newDirInput = $('#newDirInput');
@@ -373,10 +444,12 @@
         const scanStatus = $('#scanStatus');
         const searchInput = $('#searchInput');
         const songList = $('#songList');
+        const resizeTip = $('#resizeTip');
         const countDisplay = $('#countDisplay');
-        const headerCheckbox = $('#headerCheckbox');
         const selectAllBtn = $('#selectAllBtn');
         const deselectAllBtn = $('#deselectAllBtn');
+        const playAllBtn = $('#playAllBtn');
+        const playlaterAllBtn = $('#playlaterAllBtn');
         const computeBtn = $('#computeBtn');
         const hintText = $('#hintText');
         const selectedList = $('#selectedList');
@@ -390,18 +463,24 @@
         const playerTitle = $('#playerTitle');
         const playerArtist = $('#playerArtist');
         const playerAlbum = $('#playerAlbum');
+        const playerModeBtn = $('#playerModeBtn');
         const playerPlayBtn = $('#playerPlayBtn');
         const playerStopBtn = $('#playerStopBtn');
         const playerProgress = $('#playerProgress');
         const playerCurrentTime = $('#playerCurrentTime');
         const playerDuration = $('#playerDuration');
         const playerStatus = $('#playerStatus');
+        const playerVolumeRange = $('#playerVolumeRange');
+        const playerVolume = $('#playerVolume');
 
         const coverPreview = $('#coverPreview');
         const previewImage = $('#previewImage');
         const previewFilename = $('#previewFilename');
         const previewSize = $('#previewSize');
         const previewFormat = $('#previewFormat');
+
+        const playlistDiv = $('#playlistDiv');
+        const playlistPage = $('#playlistPage');
 
         const splitModal = $('#splitModal');
         const sourceList = $('#sourceList');
@@ -468,12 +547,27 @@
         }
 
         // ===== 下载音频 =====
-        function downloadAudio(cuePath, index, title, artist) {
-            if (!cuePath || isNaN(index)) {
+        function getExtraById(idx) {
+            const track = getTrackByIndex(idx);
+            const album = getAlbumByIndex(idx);
+            return {
+                "title": track.title,
+                "artist": track.performer,
+                "album": album.title,
+                "album_artist": album.performer,
+                "cover": album.cover==='[EMBEDDED]'?track.file:album.cover,
+                "index": album.tracks.indexOf(track) + 1
+            }
+        }
+
+        function downloadAudio(idx) {
+            const track = getTrackByIndex(idx);
+            if (!track) {
                 showToast('无效的音频来源', 'error');
                 return;
             }
-            const url = `/api/audio_segment?cue=${encodeURIComponent(cuePath)}&index=${index}`;
+            const extra = getExtraById(idx);
+            const url = `/api/audio_segment?file=${encodeURIComponent(track.file)}`+(track.start?`&start=${track.start}`:'')+(track.end?`&end=${track.end}`:'')+`&extra=${encodeURIComponent(JSON.stringify(extra))}`;
             showToast('正在下载...', 'info', 1500);
             fetch(url)
                 .then(res => {
@@ -484,10 +578,10 @@
                     const a = document.createElement('a');
                     a.href = URL.createObjectURL(blob);
                     let fileName;
-                    if (title) {
-                        const cleanTitle = title.replace(/[\\/:*?"<>|]/g, '_');
-                        if (artist) {
-                            const cleanArtist = artist.replace(/[\\/:*?"<>|]/g, '_');
+                    if (extra.title) {
+                        const cleanTitle = extra.title.replace(/[\\/:*?"<>|]/g, '_');
+                        if (extra.artist) {
+                            const cleanArtist = extra.artist.replace(/[\\/:*?"<>|]/g, '_');
                             fileName = `${cleanTitle} - ${cleanArtist}`;
                         } else {
                             fileName = cleanTitle;
@@ -519,11 +613,15 @@
                 this.rafId = null;
                 this.running = false;
                 this.paused = false;
+                this.resizing = false;
                 this.lastTimestamp = null;
                 this.scrollPos = 0;
                 this.maxScroll = 0;
                 this.updateMaxScroll();
                 if (this.textSpan) this.element.title = this.textSpan.textContent;
+                element.addEventListener('mouseenter', this.pause);
+                element.addEventListener('mouseleave', this.resume);
+                window.addEventListener('resize', this.onResize);
             }
             updateMaxScroll() {
                 const containerWidth = this.element.clientWidth;
@@ -543,7 +641,7 @@
             }
             tick(timestamp) {
                 if (!this.running) return;
-                if (this.paused) { this.lastTimestamp = timestamp; this.rafId = requestAnimationFrame(this.tick.bind(this)); return; }
+                if (this.paused || this.resizing) { this.lastTimestamp = timestamp; this.rafId = requestAnimationFrame(this.tick.bind(this)); return; }
                 if (this.lastTimestamp === null) { this.lastTimestamp = timestamp; this.rafId = requestAnimationFrame(this.tick.bind(this)); return; }
                 const delta = (timestamp - this.lastTimestamp) / 1000;
                 this.lastTimestamp = timestamp;
@@ -553,10 +651,29 @@
                 this.element.scrollLeft = this.scrollPos;
                 this.rafId = requestAnimationFrame(this.tick.bind(this));
             }
-            pause() { this.paused = true; }
-            resume() { this.paused = false; if (!this.running) this.start(); }
-            stop() { this.running = false; if (this.rafId) { cancelAnimationFrame(this.rafId); this.rafId = null; } this.element.scrollLeft = 0; this.scrollPos = 0; }
-            resize() {
+            pause = () => { this.paused = true; }
+            resume = () => { this.paused = false; if (!this.running) this.start(); }
+            stop() {
+                this.running = false;
+                if (this.rafId) {
+                    cancelAnimationFrame(this.rafId);
+                    this.rafId = null;
+                }
+                this.element.scrollLeft = 0;
+                this.scrollPos = 0;
+                this.element.removeEventListener('mouseenter', this.pause);
+                this.element.removeEventListener('mouseleave', this.resume);
+                window.removeEventListener('resize', this.onResize);
+            }
+            onResize = () => {
+                this.resizing = true;
+                if (this.resizeTimeout) {
+                    clearTimeout(this.resizeTimeout);
+                }
+                this.resizeTimeout = setTimeout(this.afterResize.bind(this), 200);
+            }
+            afterResize() {
+                this.resizing = false;
                 if (this.running) {
                     const hasScroll = this.updateMaxScroll();
                     if (!hasScroll) { this.stop(); return; }
@@ -566,51 +683,25 @@
             }
         }
 
-        let resizeTimer = null;
-        window.addEventListener('resize', () => {
-            if (resizeTimer) clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                if (window._titleScroller) window._titleScroller.resize();
-                if (window._artistScroller) window._artistScroller.resize();
-                if (window._albumScroller) window._albumScroller.resize();
-            }, 200);
-        });
-
-        function showPlayer(title, coverPath, album, artist) {
+        async function showPlayer(idx) {
+            const track = getTrackByIndex(idx);
+            const album = getAlbumByIndex(idx);
             miniPlayer.style.display = 'block';
-            const titleText = title || '未知歌曲';
+            const titleText = track.title;
             playerTitle.innerHTML = `<span class="scroll-text">${titleText}</span>`;
             playerTitle.title = titleText;
-            const artistText = artist && artist.trim() ? artist : '未知歌手';
-            const albumText = album && album.trim() ? album : '未知专辑';
+            const artistText = track.performer;
+            const albumText = album.title;
             playerArtist.innerHTML = `<span class="scroll-text">${artistText}</span>`;
             playerArtist.title = artistText;
             playerAlbum.innerHTML = `<span class="scroll-text">${albumText}</span>`;
             playerAlbum.title = albumText;
-            currentSongTitle = titleText;
-            if (coverPath) {
-                playerCover.src = `/api/cover?path=${encodeURIComponent(coverPath)}`;
-                const parts = coverPath.split(/[\\/]/);
-                const filename = parts[parts.length - 1] || 'cover';
-                const ext = filename.includes('.') ? filename.split('.').pop().toUpperCase() : '未知';
-                currentCoverData = { path: coverPath, name: filename, format: ext, width: 0, height: 0 };
+            if (album.cover) {
+                playerCover.src = `/api/cover?path=${encodeURIComponent(album.cover==='[EMBEDDED]'?track.file:album.cover)}`;
                 playerCover.style.display = 'block';
             } else {
                 playerCover.src = PLACEHOLDER_SVG;
-                currentCoverData = { path: '', name: '占位图', format: 'SVG', width: 48, height: 48 };
                 playerCover.style.display = 'block';
-            }
-            playerCover.onload = null;
-            if (coverPath) {
-                playerCover.onload = function() {
-                    const w = this.naturalWidth || 0;
-                    const h = this.naturalHeight || 0;
-                    if (w && h) { currentCoverData.width = w; currentCoverData.height = h; }
-                };
-                if (playerCover.complete && playerCover.naturalWidth) {
-                    currentCoverData.width = playerCover.naturalWidth;
-                    currentCoverData.height = playerCover.naturalHeight;
-                }
             }
             if (window._titleScroller) { window._titleScroller.stop(); window._titleScroller = null; }
             if (window._artistScroller) { window._artistScroller.stop(); window._artistScroller = null; }
@@ -621,12 +712,6 @@
             window._titleScroller.start();
             window._artistScroller.start();
             window._albumScroller.start();
-            playerTitle.addEventListener('mouseenter', () => { if (window._titleScroller) window._titleScroller.pause(); });
-            playerTitle.addEventListener('mouseleave', () => { if (window._titleScroller) window._titleScroller.resume(); });
-            playerArtist.addEventListener('mouseenter', () => { if (window._artistScroller) window._artistScroller.pause(); });
-            playerArtist.addEventListener('mouseleave', () => { if (window._artistScroller) window._artistScroller.resume(); });
-            playerAlbum.addEventListener('mouseenter', () => { if (window._albumScroller) window._albumScroller.pause(); });
-            playerAlbum.addEventListener('mouseleave', () => { if (window._albumScroller) window._albumScroller.resume(); });
         }
 
         function updatePlayerUI() {
@@ -637,6 +722,7 @@
             playerCurrentTime.textContent = formatTime(current);
             playerDuration.textContent = formatTime(duration);
             playerPlayBtn.textContent = currentAudio.paused ? '▶' : '⏸';
+            playerPlayBtn.title = currentAudio.paused ? '播放' : '暂停';
             playerStatus.textContent = currentAudio.paused ? '暂停' : '播放中';
         }
 
@@ -667,19 +753,6 @@
             isAdvancing = false;
         }
 
-        function buildPlaylistItems(songList) {
-            return songList.map(s => {
-                const cue = s.cueFiles && s.cueFiles.length > 0 ? s.cueFiles[0] : null;
-                if (!cue) return null;
-                const idx = s.cueTrackMap ? s.cueTrackMap[cue] : 0;
-                const cover = s.cueCoverMap ? s.cueCoverMap[cue] : '';
-                const album = s.cueAlbumMap ? s.cueAlbumMap[cue] : '';
-                const artist = s.cueTrackPerformerMap ? s.cueTrackPerformerMap[cue] : '';
-                const title = s.cueTrackTitleMap ? s.cueTrackTitleMap[cue] : (s.original_titles ? s.original_titles[0] : s.id);
-                return { cue, index: idx, title, cover, album, artist, songId: s.id };
-            }).filter(item => item !== null);
-        }
-
         function shuffleArray(arr) {
             for (let i = arr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -689,41 +762,44 @@
         }
 
         // ===== 核心播放函数 =====
-        function playSong(cuePath, index, title, coverPath, album, artist, songId, startPlaylist = true, isUserAction = true) {
-            if (currentAudio) { cleanupAudio(currentAudio); currentAudio = null; }
-            isAdvancing = false;
-            if (startPlaylist) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                state.playlist = buildPlaylistItems(available);
-                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
-                let pos = state.playlist.findIndex(item => item.songId === songId);
-                if (pos === -1) {
-                    state.playlist.push({ cue: cuePath, index, title, cover: coverPath, album, artist, songId });
-                    pos = state.playlist.length - 1;
-                }
-                state.playIndex = pos;
-            } else {
-                if (state.playlist.length === 0) {
-                    const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                    state.playlist = buildPlaylistItems(available);
-                    if (state.playMode === 'shuffle') shuffleArray(state.playlist);
-                }
-                let pos = state.playlist.findIndex(item => item.songId === songId);
-                if (pos === -1) {
-                    state.playlist.push({ cue: cuePath, index, title, cover: coverPath, album, artist, songId });
-                    pos = state.playlist.length - 1;
-                }
-                state.playIndex = pos;
+        function addTracksToPlaylist(idxs) {
+            if(!idxs.some(x => !state.playlist.includes(x))) {
+                return state.playlist.indexOf(idxs[0]);
             }
-            const playItem = state.playlist[state.playIndex];
-            if (!playItem) { playerStatus.textContent = '无有效播放项'; return; }
-            const cue = playItem.cue;
-            const idx = playItem.index;
-            const audioUrl = `/api/audio_segment?cue=${encodeURIComponent(cue)}&index=${idx}`;
+            state.playlistOrdered.push(...idxs.filter(x => !state.playlistOrdered.includes(x)));
+            (state.playMode==="shuffle"?
+            (target, source)=>{
+                for (let item of source) {
+                    target.splice(Math.floor(Math.random()*(1+target.length)), 0, item);
+                }
+            }
+            :(target, source)=>{
+                target.push(...source);
+            })(state.playlist, idxs.filter(x => !state.playlist.includes(x)));
+            if (miniPlayer.style.display === 'none' && state.playlist.length) {
+                playSong(state.playlist[0], false);
+            }
+            renderPlaylist();
+            return state.playlist.indexOf(idxs[0]);
+        }
+        function playSong(idx, play=true) {
+            switchingSongIndicator++;
+            if (currentAudio) { cleanupAudio(currentAudio); currentAudio = null; }
+            if (typeof idx === "number" && state.playlist[idx]) {
+                idx = state.playlist[idx];
+            }
+            if (!state.playlist.includes(idx)) {
+                addTracksToPlaylist([idx])
+            }
+            state.playIndex = state.playlist.indexOf(idx);
+            currentSongId = idx;
+            const track = getTrackByIndex(idx);
+            const audioUrl = `/api/audio_segment?file=${encodeURIComponent(track.file)}`+(track.start?`&start=${track.start}`:'')+(track.end?`&end=${track.end}`:'')+`&extra=${encodeURIComponent(JSON.stringify(getExtraById(idx)))}`;
             const audio = new Audio(audioUrl);
             currentAudio = audio;
-            currentSongId = playItem.songId;
-            showPlayer(playItem.title, playItem.cover, playItem.album, playItem.artist);
+            currentAudio.volume = playerVolumeRange.value / 100;
+            showPlayer(idx);
+            renderPlaylist();
             audioController = new AbortController();
             const { signal } = audioController;
             audio.addEventListener('loadedmetadata', function() { updatePlayerUI(); playerStatus.textContent = '加载完成'; }, { signal });
@@ -733,102 +809,83 @@
             audio.addEventListener('ended', function() { if (!currentAudio || currentAudio !== audio) return; handlePlaybackEnded(); }, { signal });
             audio.addEventListener('error', function(e) {
                 if (!currentAudio || currentAudio !== audio) return;
-                if (isUserAction) { playerStatus.textContent = '加载失败'; console.warn('[播放] 用户操作触发错误:', audioUrl, e); }
-                else { console.warn('[播放] 自动播放错误，尝试跳转:', audioUrl, e); if (!isAdvancing) handlePlaybackEnded(); else playerStatus.textContent = '加载失败（已跳过）'; }
+                else { console.warn('[播放] 自动播放错误，尝试跳转:', audioUrl, e); if (!switchingSongIndicator) handlePlaybackEnded(); else playerStatus.textContent = '加载失败（已跳过）'; }
             }, { signal });
-            audio.play().catch(err => {
-                if (!currentAudio || currentAudio !== audio) return;
-                if (isUserAction) { playerStatus.textContent = '播放失败'; console.warn('[播放] 用户操作播放失败:', err); }
-                else { console.warn('[播放] 自动播放失败，尝试跳转:', err); if (!isAdvancing) handlePlaybackEnded(); else playerStatus.textContent = '播放失败（已跳过）'; }
-            });
+            if (play) {
+                audio.play().catch(err => {
+                    if (!currentAudio || currentAudio !== audio) return;
+                    else { console.warn('[播放] 自动播放失败，尝试跳转:', err); if (!switchingSongIndicator) handlePlaybackEnded(); else playerStatus.textContent = '播放失败（已跳过）'; }
+                });
+            }
+            switchingSongIndicator--;
         }
 
         // ===== 播放结束处理 =====
         function handlePlaybackEnded() {
-            if (isAdvancing) { console.warn('[播放] 已处于跳转中，忽略重复调用'); return; }
+            if (switchingSongIndicator) { console.warn('[播放] 已处于跳转中，忽略重复调用'); return; }
             if (!currentAudio) { playerStatus.textContent = '播放结束'; return; }
             const mode = state.playMode;
             if (mode === 'single') { playerStatus.textContent = '播放结束'; return; }
             if (mode === 'repeat-one') {
-                isAdvancing = true;
-                const item = state.playlist[state.playIndex];
-                if (item && currentAudio) {
-                    try { currentAudio.currentTime = 0; currentAudio.play().catch(() => { const idx = item.index; const cue = item.cue; const title = item.title; const cover = item.cover; const album = item.album; const artist = item.artist; const songId = item.songId; playSong(cue, idx, title, cover, album, artist, songId, false, false); }); }
-                    catch (_) { const idx = item.index; const cue = item.cue; const title = item.title; const cover = item.cover; const album = item.album; const artist = item.artist; const songId = item.songId; playSong(cue, idx, title, cover, album, artist, songId, false, false); }
-                } else {
-                    const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                    state.playlist = buildPlaylistItems(available);
-                    if (state.playlist.length > 0) { state.playIndex = 0; const first = state.playlist[0]; playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, false, false); }
-                }
-                isAdvancing = false;
-                return;
-            }
-            const nextIdx = state.playIndex + 1;
-            if (nextIdx >= state.playlist.length) {
-                if (mode === 'shuffle' || mode === 'sequential') {
-                    state.playIndex = 0;
-                    const nextItem = state.playlist[0];
-                    if (nextItem) { playSong(nextItem.cue, nextItem.index, nextItem.title, nextItem.cover, nextItem.album, nextItem.artist, nextItem.songId, false, false); }
-                    else playerStatus.textContent = '播放结束';
-                    return;
-                } else { playerStatus.textContent = '播放结束'; return; }
-            }
-            isAdvancing = true;
-            state.playIndex = nextIdx;
-            const nextItem = state.playlist[nextIdx];
-            if (nextItem) { playSong(nextItem.cue, nextItem.index, nextItem.title, nextItem.cover, nextItem.album, nextItem.artist, nextItem.songId, false, false); }
-            else { isAdvancing = false; playerStatus.textContent = '播放结束'; }
-        }
-
-        function playPrev() {
-            if (state.playlist.length === 0) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                state.playlist = buildPlaylistItems(available);
-                if (state.playlist.length === 0) { playerStatus.textContent = '播放列表为空'; return; }
-                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
-                state.playIndex = 0;
-                const first = state.playlist[0];
-                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
-                return;
-            }
-            let prevIdx = state.playIndex - 1;
-            if (prevIdx < 0) {
-                prevIdx = state.playlist.length - 1;
-            }
-            state.playIndex = prevIdx;
-            const item = state.playlist[prevIdx];
-            if (item) {
-                playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
-            }
-        }
-
-        function playNext() {
-            if (state.playlist.length === 0) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                state.playlist = buildPlaylistItems(available);
-                if (state.playlist.length === 0) { playerStatus.textContent = '播放列表为空'; return; }
-                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
-                state.playIndex = 0;
-                const first = state.playlist[0];
-                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
+                playSong(currentSongId);
                 return;
             }
             let nextIdx = state.playIndex + 1;
             if (nextIdx >= state.playlist.length) {
-                if (state.playMode === 'shuffle' || state.playMode === 'sequential') {
-                    state.playIndex = 0;
-                    const item = state.playlist[0];
-                    if (item) playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
-                    else playerStatus.textContent = '播放列表为空';
-                    return;
-                } else {
-                    playerStatus.textContent = '已是最后一首';
-                    return;
-                }
+                if (mode === 'shuffle' || mode === 'sequential') {
+                    nextIdx = 0;
+                } else { playerStatus.textContent = '播放结束'; return; }
             }
-            state.playIndex = nextIdx;
-            const item = state.playlist[nextIdx];
-            if (item) playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
+            playSong(state.playlist[nextIdx]);
+        }
+
+        function playPrev() {
+            let nextIndex = state.playIndex - 1;
+            if (nextIndex < 0) {
+                nextIndex = state.playlist.length - 1;
+            }
+            playSong(state.playlist[nextIndex]);
+        }
+
+        function playNext() {
+            let nextIndex = state.playIndex + 1;
+            if (nextIndex >= state.playlist.length) {
+                nextIndex = 0;
+            }
+            playSong(state.playlist[nextIndex]);
+        }
+
+        function chooseByFavour(norm) {
+            if (state.favour[norm] && state.normSongs.find(x => x.id === norm)?.tracks.includes(state.favour[norm])) {
+                return state.favour[norm];
+            } else {
+                return state.normSongs.find(x => x.id === norm)?.tracks[0];
+            }
+        }
+
+        function setPlayMode(newMode) {
+            const modes = ['single', 'sequential', 'repeat-one', 'shuffle'];
+            const icons = ['▶1', '🔁', '🔂', '🎲'];
+            const titles = ['单曲播放', '顺序播放', '单曲循环', '随机播放'];
+            const oldMode = state.playMode;
+            if (oldMode === newMode || !['single', 'sequential', 'repeat-one', 'shuffle'].includes(newMode)) {
+                return;
+            }
+            const idx = modes.indexOf(newMode);
+            state.playMode = newMode;
+            playerModeBtn.textContent = icons[idx];
+            playerModeBtn.title = titles[idx];
+
+            if (oldMode === 'shuffle') {
+                state.playlist = state.playlistOrdered.slice();
+                state.playIndex = state.playlist.indexOf(currentSongId);
+                renderPlaylist();
+            }
+            if (newMode === 'shuffle') {
+                shuffleArray(state.playlist);
+                state.playIndex = state.playlist.indexOf(currentSongId);
+                renderPlaylist();
+            }
         }
 
         document.getElementById('playerModeBtn').addEventListener('click', function() {
@@ -839,136 +896,31 @@
             idx = (idx + 1) % modes.length;
             const newMode = modes[idx];
 
-            let currentItem = null;
-            if (state.playIndex >= 0 && state.playIndex < state.playlist.length) {
-                currentItem = state.playlist[state.playIndex];
-            } else if (currentSongId) {
-                currentItem = state.playlist.find(item => item.songId === currentSongId);
-            }
-
-            let baseList = [];
-            if (state.playlist.length === 0) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                baseList = buildPlaylistItems(available);
-            } else {
-                baseList = state.playlist.slice();
-            }
-
-            if (!currentItem && baseList.length > 0) {
-                currentItem = baseList[0];
-            }
-
-            let newList = [];
-            if (newMode === 'shuffle') {
-                if (currentItem) {
-                    const rest = baseList.filter(item => item.songId !== currentItem.songId);
-                    shuffleArray(rest);
-                    newList = [currentItem, ...rest];
-                } else {
-                    newList = baseList.slice();
-                    shuffleArray(newList);
-                }
-            } else {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                const ordered = buildPlaylistItems(available);
-                if (currentItem) {
-                    const exists = ordered.some(item => item.songId === currentItem.songId);
-                    if (exists) {
-                        const rest = ordered.filter(item => item.songId !== currentItem.songId);
-                        newList = [currentItem, ...rest];
-                    } else {
-                        newList = [currentItem, ...ordered];
-                    }
-                } else {
-                    newList = ordered;
-                }
-            }
-
-            if (newList.length === 0) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                newList = buildPlaylistItems(available);
-                if (currentItem) {
-                    if (!newList.some(item => item.songId === currentItem.songId)) {
-                        newList = [currentItem, ...newList];
-                    }
-                }
-            }
-
-            state.playlist = newList;
-            state.playMode = newMode;
-            this.textContent = icons[idx];
-            this.title = titles[idx];
-
-            if (currentItem) {
-                const pos = state.playlist.findIndex(item => item.songId === currentItem.songId);
-                if (pos !== -1) {
-                    state.playIndex = pos;
-                } else {
-                    state.playIndex = 0;
-                }
-            } else {
-                state.playIndex = 0;
-            }
-
-            if (!currentAudio || currentAudio.ended) {
-                if (state.playlist.length > 0) {
-                    const first = state.playlist[state.playIndex] || state.playlist[0];
-                    playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, false, true);
-                }
-            } else {
-                const item = state.playlist[state.playIndex];
-                if (item) {
-                    showPlayer(item.title, item.cover, item.album, item.artist);
-                    currentSongId = item.songId;
-                }
-            }
+            setPlayMode(newMode);
         });
 
-        document.getElementById('playerPrevBtn').addEventListener('click', function() {
-            if (state.playlist.length === 0) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                state.playlist = buildPlaylistItems(available);
-                if (state.playlist.length === 0) { showToast('播放列表为空', 'error'); return; }
-                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
-                state.playIndex = 0;
-                const first = state.playlist[0];
-                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
-                return;
-            }
-            playPrev();
-        });
+        document.getElementById('playerPrevBtn').addEventListener('click', playPrev);
 
-        document.getElementById('playerNextBtn').addEventListener('click', function() {
-            if (state.playlist.length === 0) {
-                const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0);
-                state.playlist = buildPlaylistItems(available);
-                if (state.playlist.length === 0) { showToast('播放列表为空', 'error'); return; }
-                if (state.playMode === 'shuffle') shuffleArray(state.playlist);
-                state.playIndex = 0;
-                const first = state.playlist[0];
-                playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true);
-                return;
-            }
-            playNext();
-        });
+        document.getElementById('playerNextBtn').addEventListener('click', playNext);
 
         playerPlayBtn.addEventListener('click', () => {
-            if (!currentAudio) {
-                if (state.playlist.length === 0) { const available = state.displaySongs.filter(s => s.cueFiles && s.cueFiles.length > 0); state.playlist = buildPlaylistItems(available); if (state.playMode === 'shuffle') shuffleArray(state.playlist); }
-                if (state.playlist.length > 0) { const first = state.playlist[0]; playSong(first.cue, first.index, first.title, first.cover, first.album, first.artist, first.songId, true, true); }
-                return;
-            }
             if (currentAudio.paused) currentAudio.play().catch(() => {});
             else currentAudio.pause();
         });
 
-        playerStopBtn.addEventListener('click', () => { hidePlayer(); state.playlist = []; state.playIndex = -1; playerStatus.textContent = '已停止'; });
+        playerStopBtn.addEventListener('click', () => { hidePlayer(); state.playlist = []; state.playlistOrdered = []; state.playIndex = -1; playerStatus.textContent = '已停止'; });
 
         playerProgress.addEventListener('input', () => {
             if (!currentAudio) return;
             const duration = currentAudio.duration;
             if (duration) { const seekTime = (playerProgress.value / 100) * duration; currentAudio.currentTime = seekTime; }
         });
+
+        playerVolumeRange.addEventListener("input", () => {
+            if (!currentAudio) return;
+            currentAudio.volume = playerVolumeRange.value / 100;
+            playerVolume.textContent = `${Math.round(playerVolumeRange.value)}%`;
+        })
 
         // ===== 封面预览浮窗 =====
         let previewTimeout = null;
@@ -1004,36 +956,41 @@
             const format = document.getElementById('previewFormat');
             lastMouseX = e.clientX;
             lastMouseY = e.clientY;
-            if (!currentCoverData.path) {
+            if (!getAlbumByIndex(currentSongId).cover) {
                 img.src = PLACEHOLDER_SVG;
                 filename.textContent = '占位图 (无封面)';
                 size.textContent = '48×48';
                 format.textContent = 'SVG';
             } else {
+                const track = getTrackByIndex(currentSongId);
+                const album = getAlbumByIndex(currentSongId);
                 const coverSrc = document.getElementById('playerCover').src;
                 img.src = coverSrc;
-                filename.textContent = currentCoverData.name || '未知';
-                const w = currentCoverData.width || 0;
-                const h = currentCoverData.height || 0;
+                filename.textContent = (album.cover==='[EMBEDDED]'?track.file:album.cover);
+                const w = playerCover.naturalWidth || 0;
+                const h = playerCover.naturalHeight || 0;
                 size.textContent = w && h ? `${w}×${h}` : '加载中...';
-                format.textContent = currentCoverData.format || '未知';
+                if (album.cover!=='[EMBEDDED]') {
+                    format.textContent = album.cover.split('.').at(-1).toUpperCase();
+                } else {
+                    format.textContent = '加载中...';
+                    fetch(coverSrc, {method: 'GET', cache: 'force-cache'}).then(r=>{
+                        return r.blob();
+                    }).then(blob=>{
+                        format.textContent = ({
+                            'image/jpeg': 'JPG',
+                            'image/png': 'PNG',
+                            'image/gif': 'GIF',
+                            'image/webp': 'WEBP',
+                            'image/svg+xml': 'SVG',
+                            'image/bmp': 'BMP',
+                            'image/tiff': 'TIFF'
+                        }[blob.type] || "未知格式") + "[EMBEDDED]";
+                    });
+                }
             }
             preview.style.display = 'grid';
             repositionPreview();
-            img.onload = function() {
-                if (this.naturalWidth) {
-                    currentCoverData.width = this.naturalWidth;
-                    currentCoverData.height = this.naturalHeight;
-                    size.textContent = `${this.naturalWidth}×${this.naturalHeight}`;
-                }
-                repositionPreview();
-            };
-            if (img.complete && img.naturalWidth) {
-                currentCoverData.width = img.naturalWidth;
-                currentCoverData.height = img.naturalHeight;
-                size.textContent = `${img.naturalWidth}×${img.naturalHeight}`;
-                setTimeout(repositionPreview, 20);
-            }
         }
 
         function hidePreview() {
@@ -1054,14 +1011,6 @@
             hidePreview();
         });
 
-        let previewResizeTimer = null;
-        window.addEventListener('resize', () => {
-            const preview = document.getElementById('coverPreview');
-            if (preview.style.display === 'grid') {
-                clearTimeout(previewResizeTimer);
-                previewResizeTimer = setTimeout(repositionPreview, 100);
-            }
-        });
         window.addEventListener('scroll', () => {
             const preview = document.getElementById('coverPreview');
             if (preview.style.display === 'grid') {
@@ -1077,102 +1026,180 @@
             }
         });
 
+        let resizeDisplayNoneTimeout = null;
+        let scrollRemember = null;
+        let scrollRemember2 = null;
+        window.addEventListener("resize", ()=>{
+            if (!scrollRemember) {
+                scrollRemember = $("#songListContainer").scrollTop;
+                scrollRemember2 = playlistDiv.scrollTop;
+            }
+            songList.style.display = 'none';
+            playlistDiv.style.display = 'none';
+            resizeTip.style.display = 'flex';
+            $('#resizeTip2').style.display = 'flex';
+            if (resizeDisplayNoneTimeout) {
+                clearTimeout(resizeDisplayNoneTimeout);
+            }
+            resizeDisplayNoneTimeout = setTimeout(()=>{
+                songList.style.display = '';
+                playlistDiv.style.display = '';
+                resizeTip.style.display = 'none';
+                $('#resizeTip2').style.display = 'none';
+                $("#songListContainer").scrollTop = scrollRemember;
+                playlistDiv.scrollTop = scrollRemember2;
+                scrollRemember = null;
+                scrollRemember2 = null;
+            }, 200);
+        })
+
         // ===== 核心数据构建 =====
-        function buildDisplaySongs(originalSongs, splitMap) {
-            const result = [];
-            for (const song of originalSongs) {
-                const id = song.id;
-                if (splitMap[id] && splitMap[id].length > 0) {
-                    const subIds = splitMap[id];
-                    for (const subId of subIds) {
-                        const cuePath = subId.split('|')[1];
-                        if (!cuePath) continue;
-                        const idx = song.cueTrackMap[cuePath];
-                        if (idx === undefined) continue;
-                        const subSong = {
-                            id: subId,
-                            original_titles: song.original_titles,
-                            performers: [song.cueTrackPerformerMap[cuePath] || ''],
-                            cueFiles: [cuePath],
-                            cueTrackMap: { [cuePath]: idx },
-                            cueCoverMap: { [cuePath]: song.cueCoverMap[cuePath] },
-                            cueAlbumMap: { [cuePath]: song.cueAlbumMap[cuePath] },
-                            cueArtistMap: { [cuePath]: song.cueArtistMap[cuePath] },
-                            cueTrackPerformerMap: { [cuePath]: song.cueTrackPerformerMap[cuePath] || '' },
-                            cueTrackTitleMap: { [cuePath]: song.cueTrackTitleMap[cuePath] || song.original_titles[0] },
-                            audioFile: song.audioFile,
-                            cueRef: cuePath,
-                            trackIndex: idx,
-                            cover: song.cueCoverMap[cuePath] || null,
-                            path: cuePath,
-                            _isSplit: true,
-                            _parentId: id,
-                        };
-                        result.push(subSong);
-                    }
-                    const splitCues = subIds.map(sid => sid.split('|')[1]);
-                    const remainingCues = song.cueFiles.filter(c => !splitCues.includes(c));
-                    if (remainingCues.length > 0) {
-                        const remainingSong = { ...song };
-                        remainingSong.cueFiles = remainingCues;
-                        remainingSong.cueTrackMap = {};
-                        remainingSong.cueCoverMap = {};
-                        remainingSong.cueAlbumMap = {};
-                        remainingSong.cueArtistMap = {};
-                        remainingSong.cueTrackPerformerMap = {};
-                        remainingSong.cueTrackTitleMap = {};
-                        remainingSong.performers = [];
-                        for (const c of remainingCues) {
-                            remainingSong.cueTrackMap[c] = song.cueTrackMap[c];
-                            remainingSong.cueCoverMap[c] = song.cueCoverMap[c];
-                            remainingSong.cueAlbumMap[c] = song.cueAlbumMap[c];
-                            remainingSong.cueArtistMap[c] = song.cueArtistMap[c];
-                            remainingSong.cueTrackPerformerMap[c] = song.cueTrackPerformerMap[c] || '';
-                            remainingSong.cueTrackTitleMap[c] = song.cueTrackTitleMap[c] || song.original_titles[0];
-                            const perf = song.cueTrackPerformerMap[c] || '';
-                            if (perf && !remainingSong.performers.includes(perf)) remainingSong.performers.push(perf);
-                        }
-                        remainingSong.cueRef = remainingCues[0];
-                        remainingSong.trackIndex = song.cueTrackMap[remainingCues[0]];
-                        remainingSong.cover = song.cueCoverMap[remainingCues[0]] || null;
-                        remainingSong.path = remainingCues[0];
-                        remainingSong._isSplit = false;
-                        remainingSong._parentId = undefined;
-                        result.push(remainingSong);
-                    }
+        function* iterTree(tree, path){
+            path ??= tree.name;
+            if (tree.type==='album') {
+                for (let [index, track] of tree.tracks.entries()) {
+                    yield [`${path}#${index}`, track.norm];
+                }
+            } else {
+                for (let sub of tree.content) {
+                    yield* iterTree(sub, path+'/'+sub.name);
+                }
+            }
+        }
+
+        function getTrackByIndex(index){
+            function matchKey(tree, key){
+                if (tree.type === 'album') {
+                    return tree.tracks[parseInt(key)];
                 } else {
-                    result.push({ ...song, _isSplit: false });
+                    for (let sub of tree.content) {
+                        if (key.startsWith(sub.name+'/') || (key.startsWith(sub.name+'#') && sub.type === 'album')) {
+                            return matchKey(sub, key.slice(sub.name.length+1));
+                        }
+                    }
+                }
+            }
+            for (let sub of state.albumTrees) {
+                if (index.startsWith(sub.name+'/')) {
+                    return matchKey(sub, index.slice(sub.name.length+1));
+                }
+            }
+        }
+
+        function getAlbumByIndex(index){
+            function matchKey(tree, key){
+                if (tree.type === 'album') {
+                    return tree;
+                } else {
+                    for (let sub of tree.content) {
+                        if (key.startsWith(sub.name+'/') || (key.startsWith(sub.name+'#') && sub.type === 'album') || key === sub.name) {
+                            return matchKey(sub, key.slice(sub.name.length+1));
+                        }
+                    }
+                }
+            }
+            for (let sub of state.albumTrees) {
+                if (index.startsWith(sub.name+'/')) {
+                    return matchKey(sub, index.slice(sub.name.length+1));
+                }
+            }
+        }
+
+        function getTreeByIndex(index){
+            index = index.replace(/\/$/, '');
+            function matchKey(tree, key){
+                for (let sub of tree.content) {
+                    if (index.startsWith(sub.name+'/') || index == sub.name) {
+                        return matchKey(sub, key.slice(sub.name.length+1));
+                    }
+                }
+            }
+            for (let sub of state.albumTrees) {
+                if (index.startsWith(sub.name+'/') || index === sub.name) {
+                    return matchKey(sub, index.slice(sub.name.length+1));
+                }
+            }
+        }
+
+        function buildNormSongs(trees, move = null){
+            let tempDict = {};
+            for (let dir of trees) {
+                for (let [index, norm] of iterTree(dir)) {
+                    (tempDict[norm] ??= []).push(index);
+                }
+            }
+            for (let [orig, idx, mvto] of (move ?? [])) {
+                if ((tempDict[orig] ?? []).includes(idx)) {
+                    (tempDict[mvto] ??= []).push(tempDict[orig].splice(tempDict[orig].indexOf(idx), 1)[0]);
+                }
+            }
+            let normed = [];
+            for (let [norm, indexes] of Object.entries(tempDict)) {
+                if (!indexes.length) {
+                    continue;
+                }
+                normed.push({
+                    "id": norm,
+                    "sortKey": [...new Set(indexes.map(idx=>(getTrackByIndex(idx).norm)))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).join('|'),
+                    "displayName": indexes.map(idx=>(getTrackByIndex(idx).title)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))[0],
+                    "tracks": indexes.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+                })
+            }
+            return normed.sort((a, b) => (a.sortKey.localeCompare(b.sortKey, undefined, { numeric: true }) || a.tracks[0].localeCompare(b.tracks[0], undefined, { numeric: true })));
+        }
+
+        function buildIndexToNorm(trees){
+            let result = {};
+            for (let dir of trees) {
+                for (let [index, norm] of iterTree(dir)) {
+                    result[index] = norm;
                 }
             }
             return result;
         }
 
+        function checkAlias(norm) {
+            const origNorm = [...new Set(norm.tracks.map(x=>state.indexToNorm[x]))];
+            if (origNorm.length === 1 && norm.tracks.length === Object.values(state.indexToNorm).filter(x=>x===origNorm[0]).length){
+                return origNorm[0];
+            }
+        }
+
+        function moveTrack(idx, from, to) {
+            let mv = state.normDiff.find(x=>x[1]===idx);
+            if (!mv) {
+                state.normDiff.push([from, idx, to]);
+            } else {
+                const orig = mv[0];
+                state.normDiff = state.normDiff.filter(x => x[1] !== idx);
+                if (orig !== to) {
+                    state.normDiff.push([orig, idx, to]);
+                }
+            }
+        }
+
         // ===== 拆分模态框 =====
         function openSplitModal(parentId) {
-            const original = state.songs.find(s => s.id === parentId);
+            const original = state.normSongs.find(s => s.id === parentId);
             if (!original) {
                 showToast('该条目已不存在，请刷新列表。', 'warning');
                 return;
             }
-            const allCues = original.cueFiles;
-            let splitCues = [];
-            if (state.splitMap[parentId]) {
-                splitCues = state.splitMap[parentId].map(sid => sid.split('|')[1]);
-            }
-            const availableCues = allCues.filter(c => !splitCues.includes(c));
-            if (availableCues.length === 0) {
+            if (original.tracks.length <= 1) {
                 showToast('该条目所有来源均已拆分，无法再拆分。', 'warning');
                 return;
             }
             state._pendingSplitParentId = parentId;
             let listHtml = '';
-            availableCues.forEach(cue => {
-                const perf = original.cueTrackPerformerMap[cue] || '';
-                const title = original.cueTrackTitleMap[cue] || original.original_titles[0];
+            original.tracks.forEach(idx => {
+                const track = getTrackByIndex(idx);
+                const album = getAlbumByIndex(idx);
+                const perf = track.performer;
+                const title = track.title;
                 listHtml += `
                     <li>
-                        <input type="checkbox" data-cue="${escapeHtml(cue)}" />
-                        <span class="cue-info">${escapeHtml(cue)}</span>
+                        <input type="checkbox" data-id="${escapeHtml(idx)}" />
+                        <span class="cue-info">${escapeHtml(album.file ?? track.file)}</span>
                         <span class="perf-info">${perf ? '🎤 ' + escapeHtml(perf) : ''}</span>
                         <span style="color:#94a3b8;font-size:12px;">${escapeHtml(title)}</span>
                     </li>
@@ -1180,77 +1207,81 @@
             });
             sourceList.innerHTML = listHtml;
             splitModal.style.display = 'flex';
+            sourceList.querySelectorAll("li").forEach(li => {
+                li.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'INPUT') return;
+                        const cb = this.querySelector('input[type="checkbox"]');
+                    if (cb) {
+                        cb.checked = !cb.checked;
+                        cb.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            });
+            if (original.tracks.length === 2) {
+                sourceList.querySelector("input[type=checkbox]").checked = true;
+                return confirmSplit();
+            }
         }
 
         function confirmSplit() {
             const parentId = state._pendingSplitParentId;
             if (!parentId) return;
-            const original = state.songs.find(s => s.id === parentId);
+            const original = state.normSongs.find(s => s.id === parentId);
             if (!original) {
                 showToast('父条目已不存在，请刷新列表。', 'warning');
                 closeModal();
                 return;
             }
-            const checkboxes = sourceList.querySelectorAll('input[type="checkbox"]:checked');
-            const selectedCues = Array.from(checkboxes).map(cb => cb.dataset.cue);
-            if (selectedCues.length === 0) {
-                showToast('请至少选择一个来源进行拆分。', 'error');
+            const checked = [...sourceList.querySelectorAll('input[type="checkbox"]:checked')].map(x=>x.dataset.id);
+            const unchecked = [...sourceList.querySelectorAll('input[type="checkbox"]:not(:checked)')].map(x=>x.dataset.id);
+            if (checked.length === 0 || unchecked.length === 0) {
+                showToast('拆分的某一部分为空', 'error');
                 return;
             }
-            let existingSplitCues = [];
-            if (state.splitMap[parentId]) {
-                existingSplitCues = state.splitMap[parentId].map(sid => sid.split('|')[1]);
-            }
-            const newCues = selectedCues.filter(c => !existingSplitCues.includes(c));
-            if (newCues.length === 0) {
-                showToast('所选来源均已拆分，无需重复操作。', 'info');
-                closeModal();
-                return;
-            }
-            const allSplitCues = [...existingSplitCues, ...newCues];
-            const subIds = allSplitCues.map(cue => `${parentId}|${cue}`);
-            state.splitMap[parentId] = subIds;
-            if (state.selected.has(parentId)) {
-                state.selected.delete(parentId);
-                for (const sid of subIds) {
-                    state.selected.add(sid);
+            for (let group of [checked, unchecked]) {
+                let norm = {
+                    "id": crypto.randomUUID(),
+                    "sortKey": [...new Set(group.map(idx=>(getTrackByIndex(idx).norm)))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).join('|'),
+                    "displayName": group.map(idx=>(getTrackByIndex(idx).title)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))[0],
+                    "tracks": group.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+                }
+                let orig = checkAlias(norm)
+                if (orig) {
+                    norm['id'] = orig;
+                }
+                state.normSongs.push(norm);
+                for (let idx of norm.tracks) {
+                    moveTrack(idx, parentId, norm.id);
                 }
             }
-            state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
+            state.normSongs = state.normSongs.filter(x => x.id !== parentId);
+            state.normSongs.sort((a, b) => (a.sortKey.localeCompare(b.sortKey, undefined, { numeric: true }) || a.tracks[0].localeCompare(b.tracks[0], undefined, { numeric: true })));
             saveState();
             updateUI();
             closeModal();
         }
 
-        function mergeBack(subId) {
-            const subSong = state.displaySongs.find(s => s.id === subId);
-            if (!subSong || !subSong._parentId) {
-                showToast('该条目已不存在或已合并，请刷新列表。', 'warning');
-                return;
+        function merge(norm1, norm2) {
+            const group = [...state.normSongs.find(x => x.id === norm1).tracks, ...state.normSongs.find(x => x.id === norm2).tracks];
+            let norm = {
+                "id": crypto.randomUUID(),
+                "sortKey": [...new Set(group.map(idx=>(getTrackByIndex(idx).norm)))].sort((a, b) => a.localeCompare(b, undefined, { numeric: true })).join('|'),
+                "displayName": group.map(idx=>(getTrackByIndex(idx).title)).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))[0],
+                "tracks": group.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
             }
-            const parentId = subSong._parentId;
-            const parentExists = state.songs.some(s => s.id === parentId);
-            if (!parentExists) {
-                showToast('父条目已不存在，无法合并。', 'error');
-                return;
+            let orig = checkAlias(norm)
+            if (orig) {
+                norm['id'] = orig;
             }
-            if (state.splitMap[parentId]) {
-                state.splitMap[parentId] = state.splitMap[parentId].filter(id => id !== subId);
-                if (state.splitMap[parentId].length === 0) {
-                    delete state.splitMap[parentId];
-                }
-            } else {
-                showToast('父条目已不存在，无法合并。', 'error');
-                return;
+            state.normSongs.push(norm);
+            for (let idx of state.normSongs.find(x => x.id === norm1).tracks) {
+                moveTrack(idx, norm1, norm.id);
             }
-            if (state.selected.has(subId)) {
-                state.selected.delete(subId);
-                const parentDisplay = state.displaySongs.some(s => s.id === parentId);
-                if (parentDisplay) {
-                    state.selected.add(parentId);
-                }
+            for (let idx of state.normSongs.find(x => x.id === norm2).tracks) {
+                moveTrack(idx, norm2, norm.id);
             }
-            state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
+            state.normSongs = state.normSongs.filter(x => ![norm1, norm2].includes(x.id));
+            state.normSongs.sort((a, b) => (a.sortKey.localeCompare(b.sortKey, undefined, { numeric: true }) || a.tracks[0].localeCompare(b.tracks[0], undefined, { numeric: true })));
             saveState();
             updateUI();
         }
@@ -1273,9 +1304,10 @@
         function saveState() {
             const data = {
                 dirs: state.dirs,
-                selected: Array.from(state.selected),
-                splitMap: state.splitMap,
-                version: 3,
+                selected: Array.from(state.selected).filter(x => state.normSongs.some(y => x === y.id)),
+                normDiff: state.normDiff.filter(x => x[1] in state.indexToNorm),
+                favour: Object.fromEntries(Object.entries(state.favour).filter(x => state.normSongs.map(y => y.id).includes(x[0]))),
+                version: 5,
             };
             try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (e) {}
         }
@@ -1292,9 +1324,10 @@
         function exportState() {
             const data = {
                 dirs: state.dirs,
-                splitMap: state.splitMap,
                 selected: Array.from(state.selected),
-                version: 3,
+                normDiff: state.normDiff,
+                favour: state.favour,
+                version: 5,
                 exportedAt: new Date().toISOString()
             };
             const json = JSON.stringify(data, null, 2);
@@ -1317,16 +1350,14 @@
             reader.onload = function(e) {
                 try {
                     const data = JSON.parse(e.target.result);
-                    if (!data.dirs || !data.splitMap || !data.selected) {
+                    if (!data.dirs || !data.normDiff || !data.selected) {
                         throw new Error('无效的状态文件，缺少必要字段');
                     }
-                    state.dirs = data.dirs || [];
-                    state.splitMap = data.splitMap || {};
-                    state.selected = new Set(data.selected || []);
-                    state._pendingSelected = null;
-                    
-                    state.songs = [];
-                    state.displaySongs = [];
+                    state.dirs = data.dirs;
+                    state.selected = new Set(data.selected);
+                    state.normDiff = data.normDiff;
+                    state.favour = data.favour || {};
+
                     state.playlist = [];
                     state.playIndex = -1;
                     if (currentAudio) hidePlayer();
@@ -1335,7 +1366,6 @@
                     if (state.dirs.length > 0) {
                         scanAll();
                     } else {
-                        state.displaySongs = [];
                         renderSongs();
                         updateSelectedPanel();
                         updateComputeBtn();
@@ -1354,23 +1384,19 @@
 
         function restoreState() {
             const saved = loadState();
-            if (!saved) return false;
             state.dirs = saved.dirs || [];
-            state._pendingSelected = new Set(saved.selected || []);
-            state.splitMap = saved.splitMap || {};
+            state.selected = new Set(saved.selected || []);
+            state.normDiff = saved.normDiff || [];
+            state.favour = saved.favour || {};
             renderDirs();
-            return true;
-        }
-
-        function restoreSelectedAfterScan() {
-            if (!state._pendingSelected) return;
-            const validIds = new Set(state.displaySongs.map(s => s.id));
-            for (const id of state._pendingSelected) {
-                if (validIds.has(id)) state.selected.add(id);
+            if (state.dirs.length > 0) {
+                scanAll().then(()=>{
+                    renderSongs();
+                    updateSelectedPanel();
+                    updateComputeBtn();
+                })
             }
-            state._pendingSelected = null;
-            updateUI();
-            saveState();
+            return true;
         }
 
         function escapeHtml(str) {
@@ -1389,9 +1415,14 @@
             }
             state.dirs.push(path);
             renderDirs();
-            scanStatus.textContent = `已添加目录: ${path}`;
+            state.albumTrees = [];
+            state.normSongs = [];
+            renderSongs();
+            updateSelectedPanel();
+            scanStatus.textContent = `已添加目录: ${path}，请重新扫描`;
             scanStatus.style.color = '#10b981';
             saveState();
+            hidePlayer();
             return true;
         }
 
@@ -1411,10 +1442,8 @@
                     const idx = parseInt(e.target.dataset.index);
                     state.dirs.splice(idx, 1);
                     renderDirs();
-                    state.songs = [];
-                    state.displaySongs = [];
-                    state.selected.clear();
-                    state.splitMap = {};
+                    state.albumTrees = [];
+                    state.normSongs = [];
                     renderSongs();
                     updateSelectedPanel();
                     scanStatus.textContent = '目录已更新，请重新扫描';
@@ -1428,7 +1457,7 @@
             scanStatus.textContent = '⏳ 正在打开文件夹选择窗口...';
             scanStatus.style.color = '#475569';
             try {
-                const resp = await fetch('/api/browse');
+                const resp = await fetch('/api/browse_dir'+(state.dirs.length?`?initial=${encodeURIComponent(state.dirs[state.dirs.length-1])}`:''));
                 const data = await resp.json();
                 if (!data.success) {
                     scanStatus.textContent = '❌ ' + (data.error || '选择失败');
@@ -1480,22 +1509,22 @@
                     scanStatus.style.color = '#ef4444';
                     return;
                 }
-                state.songs = data.songs || [];
-                state.displaySongs = buildDisplaySongs(state.songs, state.splitMap);
-                restoreSelectedAfterScan();
-                if (state.displaySongs.length === 0) {
+                state.albumTrees = data.result || [];
+                state.normSongs = buildNormSongs(state.albumTrees, state.normDiff);
+                state.indexToNorm = buildIndexToNorm(state.albumTrees);
+                if (state.normSongs.length === 0) {
                     scanStatus.textContent = '⚠️ 未找到任何歌曲，请检查目录路径是否正确';
                     scanStatus.style.color = '#f59e0b';
                 } else {
-                    const splitCount = Object.keys(state.splitMap).length;
                     scanStatus.textContent =
-                        `✅ 扫描完成，共 ${state.displaySongs.length} 首歌曲（合并后 ${state.songs.length} 组，已拆分 ${splitCount} 组），来自 ${data.cueCount || 0} 个 CUE 文件`;
+                        `✅ 扫描完成，共 ${Object.keys(state.indexToNorm).length} 首歌曲（合并后 ${state.normSongs.length} 组），来自 ${[...new Set(Object.keys(state.indexToNorm).map(x=>x.split('#')[0]))].length} 个 专辑`;
                     scanStatus.style.color = '#10b981';
                 }
                 saveState();
                 updateUI();
                 state.playlist = [];
                 state.playIndex = -1;
+                state.playMode = 'single';
                 hidePlayer();
             } catch (err) {
                 scanStatus.textContent = '❌ 请求失败: ' + err.message;
@@ -1507,90 +1536,76 @@
         }
 
         // ===== 渲染歌曲列表 =====
-        function renderSongs() {
+        function getFiltered() {
             const search = state.searching.trim().toLowerCase();
-            let filtered = state.displaySongs;
+            let filtered = state.normSongs;
             if (search) {
-                filtered = state.displaySongs.filter(s => {
-                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-                    return origMatch || performerMatch;
+                filtered = filtered.filter(norm => {
+                    const origMatch = (norm.tracks.map(getTrackByIndex).map(x=>x.title) || []).some(t => t.toLowerCase().includes(search));
+                    const performerMatch = (norm.tracks.map(getTrackByIndex).map(x=>x.performer) || []).some(p => p.toLowerCase().includes(search));
+                    const albumMatch = (norm.tracks.map(getAlbumByIndex).map(x=>x.title) || []).some(t => t.toLowerCase().includes(search));
+                    return origMatch || performerMatch || albumMatch;
                 });
             }
-            if (state.displaySongs.length === 0) {
+            return filtered;
+        }
+
+        function renderSongs() {
+            let filtered = getFiltered();
+            if (state.normSongs.length === 0) {
                 songList.innerHTML = `<div class="empty-msg">📂 请添加目录并扫描</div>`;
                 countDisplay.innerHTML = '共 <strong>0</strong> 首';
-                headerCheckbox.checked = false;
                 return;
             }
             if (filtered.length === 0) {
                 songList.innerHTML =
                     `<div class="empty-msg">🔍 没有匹配 "${escapeHtml(state.searching)}" 的歌曲</div>`;
-                countDisplay.innerHTML = `共 <strong>${state.displaySongs.length}</strong> 首`;
-                headerCheckbox.checked = false;
+                countDisplay.innerHTML = `共 <strong>${state.normSongs.length}</strong> 首`;
                 return;
             }
 
             let html = '';
             for (const song of filtered) {
                 const checked = state.selected.has(song.id) ? 'checked' : '';
-                const sources = song.cueFiles || [song.path];
-                const originals = song.original_titles || [];
-                const mainTitle = originals.length > 0 ? originals[0] : song.id;
-                const altTitles = originals.slice(1).filter(t => t !== mainTitle);
-                const cueTrackMap = song.cueTrackMap || {};
-                const cueCoverMap = song.cueCoverMap || {};
-                const cueAlbumMap = song.cueAlbumMap || {};
-                const cueTrackPerformerMap = song.cueTrackPerformerMap || {};
-                const cueTrackTitleMap = song.cueTrackTitleMap || {};
-
-                const original = state.songs.find(s => s.id === song.id);
-                let isMerged = false;
-                if (original && !song._isSplit) {
-                    const remainingCues = song.cueFiles || [];
-                    if (remainingCues.length > 1) {
-                        isMerged = true;
-                    }
-                }
-                const isSplit = song._isSplit === true;
+                const mainTitle = song.displayName;
+                const altTitles = song.tracks.map(getTrackByIndex).map(x => x.title).filter(t => t !== mainTitle);
 
                 let sourcesHtml = '';
-                for (const cue of sources) {
-                    const idx = cueTrackMap[cue];
-                    const hasTrack = idx !== undefined;
-                    const coverForCue = cueCoverMap[cue] || '';
-                    const albumForCue = cueAlbumMap[cue] || '';
-                    const performerForCue = cueTrackPerformerMap[cue] || '';
-                    const rawTitle = cueTrackTitleMap[cue] || mainTitle;
+                for (const idx of song.tracks) {
+                    const track = getTrackByIndex(idx);
+                    const album = getAlbumByIndex(idx);
+                    const cover = album.cover || '';
+                    const albumTitle = album.title || '';
+                    const performer = track.performer || '';
+                    const rawTitle = track.title || mainTitle;
+                    const favoured = state.favour[song.id]===idx;
 
-                    const playBtn = hasTrack ?
-                        `<button class="play-btn" data-cue="${escapeHtml(cue)}" data-index="${idx}" data-song-id="${escapeHtml(song.id)}" data-title="${escapeHtml(rawTitle)}" data-cover="${escapeHtml(coverForCue)}" data-album="${escapeHtml(albumForCue)}" data-artist="${escapeHtml(performerForCue)}" title="播放此来源的曲目片段">▶</button>` :
+                    const playBtn = `<button class="play-btn" data-track-id="${escapeHtml(idx)}" title="播放此来源的曲目片段">▶</button>`;
+                    const playLaterBtn = `<button class="playlater-btn" data-track-id="${escapeHtml(idx)}" title="将此来源的曲目片段加入播放列表">➕</button>`;
+
+                    const downloadBtn = `<button class="download-btn" data-track-id="${escapeHtml(idx)}" title="下载此来源的曲目">⬇</button>`;
+
+                    const performerTag = performer ?
+                        `<span class="performer-tag" title="${escapeHtml(performer)}">🎤 ${escapeHtml(performer)}</span>` :
                         '';
 
-                    const downloadBtn = hasTrack ?
-                        `<button class="download-btn" data-cue="${escapeHtml(cue)}" data-index="${idx}" data-title="${escapeHtml(rawTitle)}" data-artist="${escapeHtml(performerForCue)}" title="下载此来源的曲目">⬇</button>` :
-                        '';
-
-                    const performerTag = performerForCue ?
-                        `<span class="performer-tag" title="${escapeHtml(performerForCue)}">🎤 ${escapeHtml(performerForCue)}</span>` :
-                        '';
-
-                    sourcesHtml += `<span class="cue-path" data-path="${escapeHtml(cue)}">
-                        <span class="cue-file">${escapeHtml(cue)}</span>
+                    sourcesHtml += `<span class="cue-path" data-track-id="${escapeHtml(idx)}">
+                        <span class="cue-file">${escapeHtml(album.file || track.file)}</span>
                         ${performerTag}
+                        <button class="btn-favourite${favoured?' checked':''}" title="${favoured?'取消':""}设为最佳">★</button>
+                        <span style="color: #475569;">⏳${formatTime(track.duration)}</span>
                         ${playBtn}
+                        ${playLaterBtn}
                         ${downloadBtn}
                     </span>`;
                 }
 
-                const splitBtnHtml = (isMerged) ?
-                    `<button class="split-btn" data-id="${song.id}" title="拆分为独立版本（每个来源一首）">✂️</button>` :
+                const splitBtnHtml = (song.tracks.length>1) ?
+                    `<button class="split-btn" data-id="${song.id}" title="拆分为独立版本">✂️</button>` :
                     '';
-                const mergeBtnHtml = (isSplit) ?
-                    `<button class="merge-btn" data-id="${song.id}" title="合并回父条目">↺</button>` :
-                    '';
+                const mergeBtnHtml = `<button class="merge-btn" data-id="${song.id}" title="合并条目">➕</button>`;
 
-                const splitLabel = isSplit ? ' [拆]' : '';
+                const splitLabel = (!Object.values(state.indexToNorm).includes(song.id)) ? ' [修]' : '';
 
                 html += `
                     <div class="song-item" data-id="${song.id}">
@@ -1605,79 +1620,62 @@
             }
             songList.innerHTML = html;
 
+            songList.querySelectorAll('.btn-favourite').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (btn.classList.contains('checked')) {
+                        delete state.favour[btn.closest(".song-item").dataset.id];
+                        btn.classList.remove('checked');
+                    } else {
+                        state.favour[btn.closest(".song-item").dataset.id] = btn.closest(".cue-path").dataset.trackId;
+                        btn.closest(".song-item").querySelector(".btn-favourite.checked")?.classList.remove('checked');
+                        btn.classList.add('checked');
+                    }
+                    saveState();
+                });
+            });
             songList.querySelectorAll('.play-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const cuePath = btn.dataset.cue;
-                    const index = parseInt(btn.dataset.index);
-                    const songId = btn.dataset.songId;
-                    const title = btn.dataset.title || '未知歌曲';
-                    const cover = btn.dataset.cover || '';
-                    const album = btn.dataset.album || '';
-                    const artist = btn.dataset.artist || '';
-                    if (!cuePath || isNaN(index)) {
-                        console.warn('缺少 cue 或 index');
-                        return;
+                    playSong(btn.dataset.trackId);
+                });
+            });
+            songList.querySelectorAll('.playlater-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    addTracksToPlaylist([btn.dataset.trackId]);
+                    btn.textContent = '✅';
+                    setTimeout(()=>{ btn.textContent = '➕'; }, 1000);
+                    if (state.playMode==='single') {
+                        setPlayMode('sequential');
                     }
-
-                    let pos = state.playlist.findIndex(item => item.songId === songId);
-                    if (pos === -1) {
-                        const song = state.displaySongs.find(s => s.id === songId);
-                        if (song) {
-                            const item = {
-                                cue: cuePath,
-                                index: index,
-                                title: title,
-                                cover: cover,
-                                album: album,
-                                artist: artist,
-                                songId: songId
-                            };
-                            state.playlist.push(item);
-                            pos = state.playlist.length - 1;
-                        } else {
-                            console.warn('未找到歌曲:', songId);
-                            return;
-                        }
-                    } else {
-                        state.playlist[pos].cue = cuePath;
-                        state.playlist[pos].index = index;
-                        state.playlist[pos].title = title;
-                        state.playlist[pos].cover = cover;
-                        state.playlist[pos].album = album;
-                        state.playlist[pos].artist = artist;
-                    }
-
-                    state.playIndex = pos;
-                    const item = state.playlist[pos];
-                    playSong(item.cue, item.index, item.title, item.cover, item.album, item.artist, item.songId, false, true);
                 });
             });
             songList.querySelectorAll('.download-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const cuePath = btn.dataset.cue;
-                    const index = parseInt(btn.dataset.index);
-                    const title = btn.dataset.title || '';
-                    const artist = btn.dataset.artist || '';
-                    downloadAudio(cuePath, index, title, artist);
+                    downloadAudio(btn.dataset.trackId);
                 });
             });
             songList.querySelectorAll('.split-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const id = btn.dataset.id;
-                    if (id) {
-                        openSplitModal(id);
-                    }
+                    openSplitModal(btn.dataset.id);
                 });
             });
             songList.querySelectorAll('.merge-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const id = btn.dataset.id;
-                    if (id) {
-                        mergeBack(id);
+                    if (!merging) {
+                        merging = btn.dataset.id;
+                        btn.textContent = '🚫';
+                    } else {
+                        if (merging === btn.dataset.id){
+                            btn.textContent = '➕';
+                        } else {
+                            merge(merging, btn.dataset.id);
+                        }
+                        merging = null;
                     }
                 });
             });
@@ -1691,79 +1689,158 @@
                 });
             });
             songList.querySelectorAll('.song-item').forEach(item => {
-                item.addEventListener('click', (e) => {
+                item.addEventListener('mousedown', (e) => {
                     if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest(
                             '.cue-path')) return;
+                    mousedownDetail = {
+                        "x": e.clientX,
+                        "y": e.clientY,
+                        "time": Date.now(),
+                        "selection": !window.getSelection().isCollapsed
+                    };
+                });
+            });
+            songList.querySelectorAll('.song-item').forEach(item => {
+                item.addEventListener('mouseup', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON' || e.target.closest(
+                            '.cue-path')) return;
+                    if ((Math.sqrt(Math.pow(e.clientX-mousedownDetail.x, 2)+Math.pow(e.clientY-mousedownDetail.y, 2))>10) || ((Date.now()-mousedownDetail.time)>300) || mousedownDetail.selection) {
+                        return;
+                    }
                     const cb = item.querySelector('.song-checkbox');
                     if (cb) { cb.checked = !cb.checked;
                         cb.dispatchEvent(new Event('change')); }
                 });
             });
 
-            countDisplay.innerHTML = `共 <strong>${state.displaySongs.length}</strong> 首`;
+            countDisplay.innerHTML = `共 <strong>${state.normSongs.length}</strong> 首`;
             updateSelectedPanel();
-            updateHeaderCheckbox();
             updateComputeBtn();
         }
 
+        function renderPlaylist() {
+            let html = '';
+            for (let idx of state.playlist) {
+                const track = getTrackByIndex(idx);
+                const album = getAlbumByIndex(idx);
+                const albumTitle = album.title || '';
+                const performer = track.performer || '';
+                const rawTitle = track.title || mainTitle;
+
+                const playBtn = `<button class="play-btn" data-track-id="${escapeHtml(idx)}" title="播放">▶</button>`;
+                const removeBtn = `<button class="remove-btn" data-track-id="${escapeHtml(idx)}" title="从播放列表中移除">🗑️</button>`;
+
+                const downloadBtn = `<button class="download-btn" data-track-id="${escapeHtml(idx)}" title="下载此来源的曲目">⬇</button>`;
+
+                const performerTag = performer ?
+                    `<span class="performer-tag" title="${escapeHtml(performer)}">🎤 ${escapeHtml(performer)}</span>` :
+                    '';
+
+                let sourcesHtml = `<span class="cue-path" data-track-id="${escapeHtml(idx)}">
+                    <span class="cue-file">${escapeHtml(album.title)}</span>
+                    ${performerTag}
+                    <span style="color: #475569;">⏳${formatTime(track.duration)}</span>
+                    ${playBtn}
+                    ${removeBtn}
+                    ${downloadBtn}
+                </span>`;
+
+                html += `
+                    <div class="song-item${currentSongId===idx?' playing':''}" data-id="${idx}">
+                        <div class="info">
+                            <div class="title">${escapeHtml(rawTitle)}</div>
+                            <div class="sources">${sourcesHtml}</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            playlistDiv.innerHTML = html;
+            playlistDiv.querySelectorAll('.title').forEach(title=>{
+                title.addEventListener('click', ()=>{
+                    const targetItem = findSongElementById(title.closest('.song-item').dataset.id);
+                    if (targetItem) {
+                        targetItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        targetItem.style.transition = 'background 0.3s';
+                        targetItem.style.background = '#fef3c7';
+                        setTimeout(() => {
+                            targetItem.style.background = '';
+                        }, 1500);
+                    } else {
+                        console.warn('未找到歌曲元素:', id);
+                    }
+                });
+            });
+            playlistDiv.querySelectorAll('.play-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    playSong(btn.dataset.trackId);
+                });
+            });
+            playlistDiv.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (btn.dataset.trackId === currentSongId) {
+                        const playing = !(currentAudio||{paused:true}).paused;
+                        state.playlist.splice(state.playlist.indexOf(btn.dataset.trackId), 1);
+                        state.playlistOrdered.splice(state.playlistOrdered.indexOf(btn.dataset.trackId), 1);
+                        if (state.playlist.length) {
+                            state.playIndex %= state.playlist.length;
+                            playSong(state.playIndex, playing);
+                        } else {
+                            hidePlayer();
+                            playlistPage.animate([{}, {right: '-100%'}], {duration: 500}).finished.then(()=>{
+                                playlistPage.style.right = '-100%';
+                            });
+                        }
+                    } else {
+                        state.playlist.splice(state.playlist.indexOf(btn.dataset.trackId), 1);
+                        state.playlistOrdered.splice(state.playlistOrdered.indexOf(btn.dataset.trackId), 1);
+                        state.playIndex = state.playlist.indexOf(currentSongId);
+                    }
+                    renderPlaylist();
+                });
+            });
+            playlistDiv.querySelectorAll('.download-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    downloadAudio(btn.dataset.trackId);
+                });
+            });
+        }
+
+        $("#playerOpenPlaylist").addEventListener('click', ()=>{
+            playlistPage.animate([{}, {right: '0'}], {duration: 500}).finished.then(()=>{
+                playlistPage.style.right = '0';
+            });
+        })
+
+        $("#closePlaylist").addEventListener('click', () => {
+            playlistPage.animate([{}, {right: '-100%'}], {duration: 500}).finished.then(()=>{
+                playlistPage.style.right = '-100%';
+            });
+        })
+
         // ===== 其他辅助函数 =====
         function selectAllVisible() {
-            const search = state.searching.trim().toLowerCase();
-            let filtered = state.displaySongs;
-            if (search) {
-                filtered = state.displaySongs.filter(s => {
-                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-                    return origMatch || performerMatch;
-                });
-            }
+            let filtered = getFiltered();
             for (const s of filtered) state.selected.add(s.id);
             updateUI();
             saveState();
         }
 
         function deselectAllVisible() {
-            const search = state.searching.trim().toLowerCase();
-            let filtered = state.displaySongs;
-            if (search) {
-                filtered = state.displaySongs.filter(s => {
-                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-                    return origMatch || performerMatch;
-                });
-            }
+            let filtered = getFiltered();
             for (const s of filtered) state.selected.delete(s.id);
             updateUI();
             saveState();
         }
 
-        function updateHeaderCheckbox() {
-            const search = state.searching.trim().toLowerCase();
-            let filtered = state.displaySongs;
-            if (search) {
-                filtered = state.displaySongs.filter(s => {
-                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-                    return origMatch || performerMatch;
-                });
-            }
-            const vis = filtered.length;
-            const checked = filtered.filter(s => state.selected.has(s.id)).length;
-            if (vis === 0) { headerCheckbox.checked = false;
-                headerCheckbox.indeterminate = false; } else if (checked === vis) { headerCheckbox.checked = true;
-                headerCheckbox.indeterminate = false; } else if (checked === 0) { headerCheckbox.checked = false;
-                headerCheckbox.indeterminate = false; } else { headerCheckbox.checked = false;
-                headerCheckbox.indeterminate = true; }
-        }
-
         function updateSelectedPanel() {
-            const selectedSongs = state.displaySongs.filter(s => state.selected.has(s.id));
+            const selectedSongs = state.normSongs.filter(s => state.selected.has(s.id));
             selectedCount.textContent = selectedSongs.length;
             if (selectedSongs.length === 0) {
                 selectedList.innerHTML = '<span style="color:#94a3b8;font-size:13px;">暂无选择</span>';
             } else {
                 selectedList.innerHTML = selectedSongs.map(s => {
-                    const main = (s.original_titles || [])[0] || s.id;
+                    const main = s.displayName;
                     return `<span class="selected-item" data-id="${s.id}">
                         <span class="selected-text" style="cursor:pointer;text-decoration:underline;">${escapeHtml(main)}</span>
                         <span class="selected-remove" style="cursor:pointer;margin-left:6px;color:#ef4444;font-weight:bold;font-size:14px;">✕</span>
@@ -1805,14 +1882,13 @@
 
         function updateComputeBtn() {
             const count = state.selected.size;
-            computeBtn.disabled = (count === 0 || state.displaySongs.length === 0);
+            computeBtn.disabled = (count === 0 || state.normSongs.length === 0);
             hintText.textContent = count === 0 ? '请勾选歌曲' : `已选 ${count} 首，点击计算`;
         }
 
         function updateUI() {
             renderSongs();
             updateSelectedPanel();
-            updateHeaderCheckbox();
             updateComputeBtn();
             state.results = null;
             resultArea.classList.remove('visible');
@@ -1834,7 +1910,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        songs: state.displaySongs,
+                        songs: state.normSongs.map(x=>({"id": x.id, "cueFiles": x.tracks.map(y=>y.split('#')[0])})),
                         selected: Array.from(state.selected),
                         K: K,
                         w_c: w_c,
@@ -1859,31 +1935,7 @@
 
         // ===== 查找歌曲DOM元素 =====
         function findSongElementById(id) {
-            let target = document.querySelector(`.song-item[data-id="${id}"]`);
-            if (target) return target;
-            const displaySong = state.displaySongs.find(s => s.id === id);
-            if (displaySong && displaySong._parentId) {
-                const parentId = displaySong._parentId;
-                const parentDisplay = state.displaySongs.find(s => s.id === parentId);
-                if (parentDisplay) {
-                    target = document.querySelector(`.song-item[data-id="${parentId}"]`);
-                    if (target) return target;
-                }
-                const siblings = state.displaySongs.filter(s => s._parentId === parentId && s.id !== id);
-                if (siblings.length > 0) {
-                    target = document.querySelector(`.song-item[data-id="${siblings[0].id}"]`);
-                    if (target) return target;
-                }
-            }
-            const original = state.songs.find(s => s.id === id);
-            if (original) {
-                const children = state.displaySongs.filter(s => s._parentId === id);
-                if (children.length > 0) {
-                    target = document.querySelector(`.song-item[data-id="${children[0].id}"]`);
-                    if (target) return target;
-                }
-            }
-            return null;
+            return document.querySelector(`#songList .song-item[data-id="${id}"]`) || document.querySelector(`#songList .cue-path[data-track-id="${id}"]`);
         }
 
         // ===== 渲染结果 =====
@@ -1895,8 +1947,9 @@
                 return;
             }
             let html = '';
+            const bestScore = schemes[0]._cost
             schemes.forEach((scheme, idx) => {
-                const isBest = idx === 0;
+                const isBest = scheme._cost === bestScore;
                 const coveredCount = scheme.covered.length;
                 const missCount = scheme.miss.length;
                 const extraCount = scheme.extra_count || 0;
@@ -1906,11 +1959,8 @@
                 let missHtml = '';
                 if (missCount > 0) {
                     missHtml = `<div style="margin-top:6px;"><span class="miss-song-label">缺失歌曲：</span> ${scheme.miss.map(id => {
-                        const displaySong = state.displaySongs.find(s => s.id === id);
-                        const originalSong = state.songs.find(s => s.id === id);
-                        const song = displaySong || originalSong;
-                        const title = song && song.original_titles ? song.original_titles[0] : id;
-                        return `<span class="miss-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#ca8a04;">${escapeHtml(title)}</span>`;
+                        const displaySong = state.normSongs.find(s => s.id === id);
+                        return `<span class="miss-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#ca8a04;">${escapeHtml(displaySong.displayName)}</span>`;
                     }).join('、')}</div>`;
                 }
 
@@ -1919,14 +1969,12 @@
                     const extraMap = {};
                     scheme.extra.forEach(id => { extraMap[id] = (extraMap[id] || 0) + 1; });
                     const extraDisplay = Object.keys(extraMap).map(id => {
-                        const displaySong = state.displaySongs.find(s => s.id === id);
-                        const originalSong = state.songs.find(s => s.id === id);
-                        const song = displaySong || originalSong;
-                        const title = song && song.original_titles ? song.original_titles[0] : id;
+                        const displaySong = state.normSongs.find(s => s.id === id);
+                        const title = displaySong.displayName;
                         const count = extraMap[id];
                         return `<span class="extra-song" data-song-id="${escapeHtml(id)}" style="cursor:pointer;text-decoration:underline;color:#dc2626;">${escapeHtml(title)}${count > 1 ? ` (×${count})` : ''}</span>`;
                     });
-                    extraHtml = `<div style="margin-top:6px;"><span class="extra-song-label">额外歌曲（重复）：</span> ${extraDisplay.join('、')}</div>`;
+                    extraHtml = `<div style="margin-top:6px;"><span class="extra-song-label">额外歌曲（含重复）：</span> ${extraDisplay.join('、')}</div>`;
                 }
 
                 html += `
@@ -1939,12 +1987,13 @@
                                 ${missCount > 0 ? `<span class="bad">❌ 缺失 ${missCount} 首</span>` : ''}
                                 ${extraCount > 0 ? `<span class="neutral">➕ 额外 ${extraCount} 首</span>` : ''}
                                 <span>📁 ${scheme.cueFiles.length} 个 CUE</span>
+                                <span>💲 ${scheme._cost} 分</span>
                             </span>
                         </div>
                         <div style="margin-top:8px;font-size:13px;">
                             <div><strong>使用的 CUE 文件：</strong></div>
                             <ul class="cue-list">
-                                ${scheme.cueFiles.map(c => `<li><span class="cue-path" data-path="${escapeHtml(c.path)}" style="cursor:pointer;text-decoration:underline;color:#3b82f6;">${escapeHtml(c.path)}</span> (${c.songs.length} 首)</li>`).join('')}
+                                ${scheme.cueFiles.map(c => `<li><span class="cue-path" data-path="${escapeHtml(c.path.endsWith('.cue')?c.path:c.path.replace(/\/[^/]*$/, ''))}" style="cursor:pointer;text-decoration:underline;color:#3b82f6;">${escapeHtml(c.path)}</span> (${c.songs.length} 首)</li>`).join('')}
                             </ul>
                             ${missHtml}
                             ${extraHtml}
@@ -1959,10 +2008,10 @@
                     e.stopPropagation();
                     const path = this.dataset.path;
                     if (!path) return;
-                    fetch('/api/open_file', {
+                    fetch('/api/open_explorer', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ path: path })
+                        body: JSON.stringify({ path: path, select: path.endsWith('.cue') })
                     }).then(res => res.json()).then(data => {
                         if (!data.success) showToast('打开失败: ' + (data.error || '未知错误'), 'error');
                     }).catch(err => showToast('请求失败: ' + err.message, 'error'));
@@ -2044,7 +2093,7 @@
 
         async function browseExportDir() {
             try {
-                const resp = await fetch('/api/browse');
+                const resp = await fetch('/api/browse_dir');
                 const data = await resp.json();
                 if (data.success) {
                     exportDirInput.value = data.path;
@@ -2067,30 +2116,18 @@
             const duplicate = exportDuplicate.value;
 
             // 获取选中的歌曲列表
-            const selectedSongs = state.displaySongs.filter(s => state.selected.has(s.id));
+            const selectedSongs = [...state.selected].filter(x => state.normSongs.some(y => y.id === x));
             if (selectedSongs.length === 0) {
                 showToast('没有选中的歌曲', 'error');
                 return;
             }
 
             // 准备数据（只传递必要字段）
-            const songsData = selectedSongs.map(s => ({
-                id: s.id,
-                original_titles: s.original_titles,
-                performers: s.performers,
-                cueFiles: s.cueFiles,
-                cueTrackMap: s.cueTrackMap,
-                cueCoverMap: s.cueCoverMap,
-                cueAlbumMap: s.cueAlbumMap,
-                cueArtistMap: s.cueArtistMap,
-                cueTrackPerformerMap: s.cueTrackPerformerMap,
-                cueTrackTitleMap: s.cueTrackTitleMap,
-                cueRef: s.cueRef || (s.cueFiles ? s.cueFiles[0] : null),
-                trackIndex: s.trackIndex,
-                cover: s.cover,
-                path: s.path,
-                _isSplit: s._isSplit,
-                _parentId: s._parentId,
+            const songsData = selectedSongs.map(idx => ({
+                file: getTrackByIndex(chooseByFavour(idx)).file,
+                start: getTrackByIndex(chooseByFavour(idx)).start,
+                end: getTrackByIndex(chooseByFavour(idx)).end,
+                extra: getExtraById(chooseByFavour(idx))
             }));
 
             // 显示进度区域
@@ -2108,7 +2145,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        songs: songsData,
+                        commands: songsData,
                         targetDir: targetDir,
                         format: format,
                         template: template,
@@ -2254,48 +2291,34 @@
         searchInput.addEventListener('input', (e) => {
             state.searching = e.target.value;
             renderSongs();
-            updateHeaderCheckbox();
-        });
-        headerCheckbox.addEventListener('change', (e) => {
-            const checked = e.target.checked;
-            const search = state.searching.trim().toLowerCase();
-            let filtered = state.displaySongs;
-            if (search) {
-                filtered = state.displaySongs.filter(s => {
-                    const origMatch = (s.original_titles || []).some(t => t.toLowerCase().includes(search));
-                    const performerMatch = (s.performers || []).some(p => p.toLowerCase().includes(search));
-                    return origMatch || performerMatch;
-                });
-            }
-            for (const s of filtered) {
-                if (checked) state.selected.add(s.id);
-                else state.selected.delete(s.id);
-            }
-            updateUI();
-            saveState();
         });
         selectAllBtn.addEventListener('click', selectAllVisible);
         deselectAllBtn.addEventListener('click', deselectAllVisible);
         computeBtn.addEventListener('click', computeBest);
-        document.addEventListener('keydown', (e) => {
-            if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
-                const active = document.activeElement;
-                if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) return;
-                e.preventDefault();
-                selectAllVisible();
+
+        playAllBtn.addEventListener('click', () => {
+            if (state.playMode==='single') {
+                setPlayMode('sequential');
             }
-        });
+            playSong(addTracksToPlaylist(getFiltered().map(x => x.id).map(chooseByFavour)));
+        })
+        playlaterAllBtn.addEventListener('click', () => {
+            if (state.playMode==='single') {
+                setPlayMode('sequential');
+            }
+            addTracksToPlaylist(getFiltered().map(x => x.id).map(chooseByFavour));
+        })
 
         // Ctrl+点击cue-path打开文件
         document.getElementById('songList').addEventListener('click', function(e) {
-            const cuePathEl = e.target.closest('.cue-path');
+            const cuePathEl = e.target.closest('.cue-file');
             if (!cuePathEl) return;
             if (e.target.closest('.play-btn')) return;
             if (e.ctrlKey || e.metaKey) {
                 e.preventDefault();
-                const path = cuePathEl.dataset.path;
+                const path = cuePathEl.textContent;
                 if (!path) return;
-                fetch('/api/open_file', {
+                fetch('/api/open_explorer', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ path: path })
@@ -2358,29 +2381,12 @@
                 showToast('无法获取当前歌曲信息', 'error');
                 return;
             }
-            downloadAudio(item.cue, item.index, item.title || '', item.artist || '');
+            downloadAudio(item);
         });
 
         // ===== 初始化 =====
         function init() {
             const hasSaved = restoreState();
-            if (hasSaved) {
-                renderDirs();
-                renderSongs();
-                updateSelectedPanel();
-                updateComputeBtn();
-            } else {
-                renderDirs();
-                renderSongs();
-                updateSelectedPanel();
-                updateComputeBtn();
-            }
-            if (hasSaved && state.dirs.length > 0) {
-                setTimeout(() => scanAll(), 300);
-            } else {
-                state._pendingSelected = null;
-            }
-            state.initialized = true;
             console.log('🎵 工具已初始化，支持导出选中歌曲。');
         }
         init();
