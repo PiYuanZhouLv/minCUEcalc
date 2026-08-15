@@ -430,7 +430,6 @@ def extract_cover(audio):
         return outpath
 
 def export_song(output, format, file, start=None, end=None, extra=None):
-    print(output, format, file, start, end, extra)
     if not extra:
         extra = {}
     target = os.path.splitext(file)[1].lower().lstrip('.') if format == 'keep' else format
@@ -494,8 +493,6 @@ def export_song(output, format, file, start=None, end=None, extra=None):
 
     cmd += ['-y', output]
 
-    print(cmd)
-
     subprocess.run(cmd, capture_output=True, check=True, text=True, encoding='utf-8', timeout=120)
 
 def get_cached_segment(audio_file, start = None, end = None, extra = None):
@@ -536,7 +533,6 @@ def export_selected_songs(target_dir, commands, ext, template, duplicate_mode):
     songs: 列表，每个元素包含基本字段，且必须包含 'selectedCue' 和 'selectedIndex'（若缺省则使用默认）
     meta_data: 已有的元数据字典（用于更新）
     """
-    print(target_dir, commands, ext, template, duplicate_mode)
     total = len(commands)
     success_count = 0
     skip_count = 0
