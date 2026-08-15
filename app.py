@@ -174,7 +174,7 @@ def parse_audios(dir):
             "duration": get_audio_duration(os.path.join(dir, fn)),
             "_album": ffprobe('format_tags=album', os.path.join(dir, fn)),
             "_album_performer": ffprobe('format_tags=album_artist', os.path.join(dir, fn)),
-            "_index": ffprobe('format_tags=track', os.path.join(dir, fn)),
+            "_index": int(ffprobe('format_tags=track', os.path.join(dir, fn)) or 0),
             "_fn": os.path.splitext(fn)[0]
         })
     albums = {}
