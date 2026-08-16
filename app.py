@@ -459,6 +459,7 @@ def export_song(output, format, file, start=None, end=None, extra=None):
             extra['cover'] = extract_cover(file)
         cmd += [
             '-i', extra['cover'],
+            '-c:v', 'copy',
             '-map', '0:a',
             '-map', '1',
             '-disposition:v:0', 'attached_pic'
@@ -490,8 +491,12 @@ def export_song(output, format, file, start=None, end=None, extra=None):
         cmd.extend(['-metadata', f'album={extra["album"]}'])
     if 'album_artist' in extra:
         cmd.extend(['-metadata', f'album_artist={extra["album_artist"]}'])
+    if 'index' in extra:
+        cmd.extend(['-metadata', f'track={extra["index"]}'])
 
     cmd += ['-y', output]
+
+    print(cmd)
 
     subprocess.run(cmd, capture_output=True, check=True, text=True, encoding='utf-8', timeout=120)
 
@@ -557,6 +562,7 @@ def export_selected_songs(target_dir, commands, ext, template, duplicate_mode):
             continue
         try:
             export_song(final_path, ext, **song)
+            success_count += 1
             yield {'event': 'progress', 'current': idx+1, 'total': total, 'title': song['extra'].get('title', '未知标题'), 'status': 'success' if action == 'new' else action, 'path': final_path}
 
         except subprocess.CalledProcessError as e:

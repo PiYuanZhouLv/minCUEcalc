@@ -95,7 +95,7 @@
         /* 迷你播放器 */
         #miniPlayer { display:none; position:fixed; bottom:0; left:0; right:0; background:#1e293b; color:#fff; padding:12px 20px; box-shadow:0 -2px 10px rgba(0,0,0,0.3); z-index:1000; font-family: -apple-system, sans-serif; }
         #miniPlayer .player-inner { display:flex; align-items:center; gap:16px; flex-wrap:wrap; max-width:1300px; margin:0 auto; }
-        #miniPlayer .player-cover { width:48px; height:48px; object-fit:cover; border-radius:4px; flex-shrink:0; background:#475569; }
+        #miniPlayer .player-cover { width:48px; height:48px; object-fit:cover; border-radius:4px; flex-shrink:0; background:#475569; cursor: pointer; }
         #miniPlayer .player-info { flex:2; min-width:200px; display:flex; flex-direction:column; overflow:hidden; }
         #miniPlayer .player-title { font-weight:500; white-space:nowrap; overflow:hidden; position:relative; cursor:default; scrollbar-width:none; -ms-overflow-style:none; cursor:pointer; }
         #miniPlayer .player-title::-webkit-scrollbar { display:none; }
@@ -713,6 +713,19 @@
             window._artistScroller.start();
             window._albumScroller.start();
         }
+
+        playerCover.addEventListener("click", () => {
+            if(!currentSongId) return;
+            const album = getAlbumByIndex(currentSongId);
+            const track = getTrackByIndex(currentSongId);
+            fetch('/api/open_explorer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ path: album.cover==='[EMBEDDED]'?track.file:album.cover, select: true })
+            }).then(res => res.json()).then(data => {
+                if (!data.success) showToast('打开失败: ' + (data.error || '未知错误'), 'error');
+            }).catch(err => showToast('请求失败: ' + err.message, 'error'));
+        })
 
         function updatePlayerUI() {
             if (!currentAudio) return;
