@@ -496,8 +496,6 @@ def export_song(output, format, file, start=None, end=None, extra=None):
 
     cmd += ['-y', output]
 
-    print(cmd)
-
     subprocess.run(cmd, capture_output=True, check=True, text=True, encoding='utf-8', timeout=120)
 
 def get_cached_segment(audio_file, start = None, end = None, extra = None):
